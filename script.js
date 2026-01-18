@@ -1,14 +1,15 @@
 const images = [
-  "CAS00742.jpg",
-  "CAS00743.jpg",
-  "CAS00744.jpg",
-  "CAS01018.jpg",
-  "CAS02101.jpg"
+  "https://drive.google.com/uc?export=view&id=13dcxn4CQBbtMYVZ-dTJemHrydBYoH2gZ",
+  "https://drive.google.com/uc?export=view&id=1RwR525NGVVn7kmevhPgE6GcgJmwmHQLK",
+  "https://drive.google.com/uc?export=view&id=10qdbXxFIYZgzG2zNTyAVCocvuPUX47Re",
+  "https://drive.google.com/uc?export=view&id=1CHwZ7aSmwJAYlSs_v966gHZ-5QsY2Ic3",
+  "https://drive.google.com/uc?export=view&id=1lCVuI86W9GcnHBq_WuHoCLFVPjpcPiuV"
 ];
 
 const bookElement = document.getElementById("book");
 const indicator = document.getElementById("page-indicator");
 
+// Criar páginas
 function createPages() {
   bookElement.innerHTML = "";
 
@@ -35,6 +36,7 @@ function createPages() {
 
 createPages();
 
+// Inicializar PageFlip
 const pageFlip = new St.PageFlip(bookElement, {
   width: 450,
   height: 450,
@@ -47,11 +49,11 @@ const pageFlip = new St.PageFlip(bookElement, {
 
 pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 
-/* Botões */
+// Navegação
 document.getElementById("next").onclick = () => pageFlip.flipNext();
 document.getElementById("prev").onclick = () => pageFlip.flipPrev();
 
-/* Indicador */
+// Indicador
 pageFlip.on("flip", e => {
   const page = e.data + 1;
   const total = pageFlip.getPageCount();
