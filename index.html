@@ -2,21 +2,16 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Álbum 3D Realista</title>
+<title>Álbum Virtual Realista</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-  background:radial-gradient(circle,#111 0%,#000 70%);
+  background:#e5e5e5;
   font-family:Arial,Helvetica,sans-serif;
   overflow:hidden;
-  color:#fff;
 }
 
 /* ===== STAGE ===== */
@@ -31,14 +26,14 @@ body{
 
 /* ===== BOOK ===== */
 #book{
-  width:min(92vw,1100px);
+  width:min(94vw,1100px);
   aspect-ratio:2 / 1;
   position:relative;
   display:flex;
   transform-style:preserve-3d;
 }
 
-/* ===== MOBILE MODE ===== */
+/* ===== MOBILE ===== */
 body.mobile #book{
   aspect-ratio:1 / 1;
 }
@@ -46,32 +41,30 @@ body.mobile #book{
 /* ===== PAGE ===== */
 .page{
   flex:1;
-  position:relative;
+  background:#fff;
+  border-radius:10px;
   overflow:hidden;
-  background:#000;
-  border-radius:12px;
-  box-shadow:0 25px 60px rgba(0,0,0,.85);
+  position:relative;
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.25),
+    inset 0 0 0 1px #ddd;
 }
 
 .page img{
   width:100%;
   height:100%;
-  object-fit:cover;
-  user-select:none;
+  object-fit:contain;
+  background:#fff;
   pointer-events:none;
 }
 
 /* ===== SPINE ===== */
 #spine{
-  width:30px;
-  background:
-    linear-gradient(to right,
-      #000 0%,
-      #333 50%,
-      #000 100%);
+  width:26px;
+  background:linear-gradient(to right,#ddd,#f8f8f8,#ddd);
   box-shadow:
-    inset -4px 0 8px rgba(255,255,255,.2),
-    inset 4px 0 12px rgba(0,0,0,.9);
+    inset -3px 0 6px rgba(0,0,0,.15),
+    inset 3px 0 6px rgba(255,255,255,.7);
 }
 
 /* ===== DRAG PAGE ===== */
@@ -84,21 +77,22 @@ body.mobile #book{
   transform-origin:left center;
   pointer-events:none;
   backface-visibility:hidden;
+  border-radius:10px;
   overflow:hidden;
-  border-radius:12px;
+  background:white;
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
 }
 
-/* Curvatura fake mesh */
+/* Curvatura fake */
 #dragPage::after{
   content:"";
   position:absolute;
   inset:0;
   background:
-    linear-gradient(120deg,
-      rgba(255,255,255,.25),
+    linear-gradient(115deg,
+      rgba(255,255,255,.9),
       rgba(255,255,255,0) 40%,
-      rgba(0,0,0,.4) 70%);
-  mix-blend-mode:overlay;
+      rgba(0,0,0,.25) 75%);
   pointer-events:none;
 }
 
@@ -107,18 +101,8 @@ body.mobile #book{
   position:absolute;
   inset:0;
   pointer-events:none;
-  background:linear-gradient(to left,rgba(0,0,0,.7),transparent);
+  background:linear-gradient(to left,rgba(0,0,0,.45),transparent);
   opacity:0;
-}
-
-/* ===== INDICATOR ===== */
-#indicator{
-  position:fixed;
-  bottom:16px;
-  width:100%;
-  text-align:center;
-  font-size:14px;
-  color:#ccc;
 }
 
 /* ===== BUTTONS ===== */
@@ -128,20 +112,25 @@ body.mobile #book{
   transform:translateY(-50%);
   padding:14px 18px;
   font-size:18px;
-  background:rgba(0,0,0,.6);
-  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.9);
+  border:1px solid #ccc;
   border-radius:8px;
-  color:#fff;
   cursor:pointer;
-  backdrop-filter:blur(6px);
-  user-select:none;
 }
 
-#prevBtn{ left:20px; }
-#nextBtn{ right:20px; }
+#prevBtn{ left:18px; }
+#nextBtn{ right:18px; }
 
-body.mobile .nav-btn{
-  display:none;
+body.mobile .nav-btn{ display:none; }
+
+/* ===== INDICATOR ===== */
+#indicator{
+  position:fixed;
+  bottom:14px;
+  width:100%;
+  text-align:center;
+  font-size:14px;
+  color:#444;
 }
 </style>
 </head>
@@ -177,10 +166,6 @@ const images = [
 
 // ================= CORE =================
 let index = 0;
-let dragging = false;
-let startX = 0;
-let velocity = 0;
-let lastTime = 0;
 let animating = false;
 
 const left = document.getElementById("left");
@@ -193,13 +178,9 @@ const book = document.getElementById("book");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 
-// ================= MOBILE DETECT =================
+// ================= MOBILE =================
 function detectMobile(){
-  if(window.innerWidth < 760){
-    document.body.classList.add("mobile");
-  }else{
-    document.body.classList.remove("mobile");
-  }
+  document.body.classList.toggle("mobile", window.innerWidth < 760);
 }
 window.addEventListener("resize", detectMobile);
 detectMobile();
@@ -218,81 +199,32 @@ function render(){
 }
 render();
 
-// ================= DRAG =================
-function startDrag(x){
-  if(animating) return;
-  if(index >= images.length-1) return;
-
-  dragging = true;
-  startX = x;
-  velocity = 0;
-  lastTime = Date.now();
-
-  dragPage.innerHTML = `<img src="${images[index]}">`;
-  shadow.style.opacity = 0.4;
-}
-
-function moveDrag(x){
-  if(!dragging) return;
-
-  const dx = x - startX;
-  const pageWidth = book.offsetWidth / 2;
-
-  let progress = Math.max(-pageWidth, Math.min(0, dx));
-  let angle = (progress / pageWidth) * 180;
-
-  dragPage.style.transform = `
-    rotateY(${angle}deg)
-    skewY(${angle/25}deg)
-  `;
-
-  const now = Date.now();
-  velocity = (x - startX) / (now - lastTime + 1);
-  lastTime = now;
-
-  shadow.style.opacity = Math.min(0.9, Math.abs(angle)/160);
-}
-
-function endDrag(){
-  if(!dragging) return;
-  dragging = false;
-
-  const inertia = velocity * 320;
-
-  if(inertia < -120){
-    flipNext();
-  }else{
-    dragPage.style.transform = "rotateY(0deg)";
-    shadow.style.opacity = 0;
-  }
-}
-
-// ================= FLIP =================
+// ================= FLIP NEXT =================
 function flipNext(){
   if(animating) return;
   if(index >= images.length-1) return;
-
   animating = true;
 
   dragPage.innerHTML = `<img src="${images[index]}">`;
-  dragPage.style.transition = "transform .7s cubic-bezier(.2,.7,.2,1)";
+  dragPage.style.transition = "transform .7s cubic-bezier(.3,.8,.2,1)";
   dragPage.style.transform = "rotateY(-180deg)";
-  shadow.style.opacity = 0.6;
+  shadow.style.opacity = 0.5;
 
   setTimeout(()=>{
     dragPage.style.transition = "";
     dragPage.style.transform = "";
     dragPage.innerHTML = "";
     index += document.body.classList.contains("mobile") ? 1 : 2;
+    shadow.style.opacity = 0;
     animating = false;
     render();
   },700);
 }
 
+// ================= FLIP PREV =================
 function flipPrev(){
   if(animating) return;
   if(index <= 0) return;
-
   animating = true;
 
   index -= document.body.classList.contains("mobile") ? 1 : 2;
@@ -303,14 +235,6 @@ function flipPrev(){
 }
 
 // ================= EVENTS =================
-right.addEventListener("mousedown", e=>startDrag(e.clientX));
-window.addEventListener("mousemove", e=>moveDrag(e.clientX));
-window.addEventListener("mouseup", endDrag);
-
-right.addEventListener("touchstart", e=>startDrag(e.touches[0].clientX));
-window.addEventListener("touchmove", e=>moveDrag(e.touches[0].clientX));
-window.addEventListener("touchend", endDrag);
-
 nextBtn.onclick = flipNext;
 prevBtn.onclick = flipPrev;
 </script>
