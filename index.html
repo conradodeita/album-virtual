@@ -3,116 +3,147 @@
 <head>
 <meta charset="UTF-8">
 <title>Álbum Virtual</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://unpkg.com/page-flip/dist/index.umd.js"></script>
+<!-- PageFlip local -->
+<script src="pageflip.min.js"></script>
 
 <style>
 body {
   margin: 0;
   background: #111;
+  font-family: Arial, sans-serif;
   overflow: hidden;
 }
 
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .toolbar {
-  position: fixed;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+  padding: 10px;
+  background: #000;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
 }
 
 .toolbar button {
   background: #222;
-  color: white;
   border: none;
-  padding: 10px 14px;
-  border-radius: 6px;
-  margin: 0 5px;
+  color: white;
+  padding: 10px 16px;
   cursor: pointer;
+  border-radius: 5px;
+}
+
+.toolbar button:hover {
+  background: #444;
 }
 
 #book {
-  width: 100vw;
-  height: 100vh;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .page img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: black;
+  object-fit: cover;
   cursor: zoom-in;
 }
 
-/* Zoom */
-#zoom {
+/* Zoom modal */
+#zoomModal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.95);
+  background: rgba(0,0,0,.9);
   display: none;
   justify-content: center;
   align-items: center;
-  z-index: 99;
+  z-index: 999;
 }
 
-#zoom img {
+#zoomModal img {
   max-width: 95%;
   max-height: 95%;
+  cursor: zoom-out;
 }
 </style>
 </head>
 
 <body>
 
-<div class="toolbar">
-  <button onclick="pageFlip.flipPrev()">◀</button>
-  <button onclick="pageFlip.flipNext()">▶</button>
-  <button onclick="toggleFullscreen()">⛶</button>
+<div id="app">
+  <div class="toolbar">
+    <button onclick="pageFlip.flipPrev()">⬅️ Anterior</button>
+    <button onclick="pageFlip.flipNext()">Próxima ➡️</button>
+    <button onclick="toggleFullscreen()">🖥️ Tela cheia</button>
+  </div>
+
+  <div id="book"></div>
 </div>
 
-<div id="book"></div>
-
-<div id="zoom" onclick="closeZoom()">
-  <img id="zoomImg">
+<div id="zoomModal" onclick="closeZoom()">
+  <img id="zoomImage">
 </div>
 
 <script>
 const images = [
   // CAPA
-  "SUA_CAPA_AQUI.jpg",
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg",
 
-  // MIolo
-  "FOTO1.jpg",
-  "FOTO2.jpg",
-  "FOTO3.jpg",
+  // PÁGINAS
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/qNEexo_dNL8-0oCofAljcVJFCTV3ZNlV/bdDGeVS7xD1w9l9IcE0L6z8vmYH8FFbe/A9zTFht7a6E7ez6hREaW3YOtprh60w0u/Wi1bdshLwU4.jpg",
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/Pw65VlFkMsO6lQV4CDlyrWsjXSkEz0Ah/c1i9ixp9Tg4A9hTDQdcO1Dxc_yoBdACL/FPfIlczoHtlqVb5752-w7QR0voXhMX9o/RQShPhBhB68.jpg",
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/zZqnEvAAIq6FvmDfHTFJsBgKq8WvL3nN/etBmGlCmqocfOuTYTj47VdmnJUlMdJQb/5pfWbmfSHzYVP2ZQTXxT0z3RwnNp6C5_/T83uCi3ltVc.jpg",
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/jiBuVFhkgxZMh4Wla0d04ExhZSW-9Y09/SZWHP4lTKay1zdNJyyl_XcVtWr2o6qxm/mpIIlAh7ux9fboPNVlRqOXz3N0GVMkMP/eVq_OU5Y-FU.jpg",
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/8gCM3saGL9vugTjFfIGW6HRjn6Ohg-Te/Z8J9OcgsHBZyJ6UI6sTsHRFqZFRF-a7M/bzylEzdicq9A1agfjdUp34Q1wfpHF8Eb/fGgeWxfcm1A.jpg",
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/e3HkNKPh5OqI4T4PYUEFR0zzPbBA8PBB/IlBpfiue1_ALoFp_3RBlUp5V4kCwsQ3q/tk-pFB0oWzVexZlmuqVzvh4Wbp75Zjyz/-_FFkk8xOXI.jpg",
 
   // CONTRACAPA
-  "SUA_CAPA_AQUI.jpg"
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg"
 ];
 
-const pageFlip = new St.PageFlip(
-  document.getElementById("book"),
-  {
-    width: 550,
-    height: 750,
-    size: "stretch",
-    showCover: true,
-    maxShadowOpacity: 0.4
-  }
-);
+const book = document.getElementById("book");
 
-pageFlip.loadFromImages(images);
+// Cria páginas
+images.forEach(src => {
+  const page = document.createElement("div");
+  page.className = "page";
 
-// Zoom
-document.getElementById("book").addEventListener("click", e => {
-  if (e.target.tagName === "IMG") {
-    document.getElementById("zoomImg").src = e.target.src;
-    document.getElementById("zoom").style.display = "flex";
-  }
+  const img = document.createElement("img");
+  img.src = src;
+  img.onclick = () => openZoom(src);
+
+  page.appendChild(img);
+  book.appendChild(page);
 });
 
+// Inicializa PageFlip
+const pageFlip = new St.PageFlip(book, {
+  width: 450,
+  height: 600,
+  size: "stretch",
+  showCover: true,
+  mobileScrollSupport: true,
+  maxShadowOpacity: 0.5
+});
+
+pageFlip.loadFromHTML(document.querySelectorAll(".page"));
+
+// Zoom
+function openZoom(src) {
+  document.getElementById("zoomImage").src = src;
+  document.getElementById("zoomModal").style.display = "flex";
+}
+
 function closeZoom() {
-  document.getElementById("zoom").style.display = "none";
+  document.getElementById("zoomModal").style.display = "none";
 }
 
 // Fullscreen
