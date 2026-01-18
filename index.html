@@ -2,21 +2,21 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Flipbook Profissional</title>
+<title>Flipbook Realista</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+*{margin:0;padding:0;box-sizing:border-box}
 
-body {
-  background: radial-gradient(circle, #111 0%, #000 70%);
-  font-family: Arial, Helvetica, sans-serif;
+body{
+  background:radial-gradient(circle,#111 0%,#000 70%);
+  font-family:Arial,Helvetica,sans-serif;
   overflow:hidden;
   color:#fff;
 }
 
 /* ===== TOOLBAR ===== */
-.toolbar {
+.toolbar{
   position:fixed;
   top:0;
   width:100%;
@@ -29,17 +29,8 @@ body {
   z-index:100;
 }
 
-.toolbar button {
-  background:#222;
-  color:white;
-  border:none;
-  padding:9px 14px;
-  border-radius:6px;
-  cursor:pointer;
-}
-
 /* ===== STAGE ===== */
-#stage {
+#stage{
   position:absolute;
   top:54px;
   width:100%;
@@ -47,11 +38,11 @@ body {
   display:flex;
   justify-content:center;
   align-items:center;
-  perspective:3000px;
+  perspective:3200px;
 }
 
 /* ===== BOOK ===== */
-#book {
+#book{
   width:min(96vw,980px);
   height:min(80vh,640px);
   position:relative;
@@ -60,64 +51,97 @@ body {
 }
 
 /* ===== SPINE ===== */
-#spine {
-  width:26px;
+#spine{
+  width:28px;
   background:linear-gradient(to right,#050505,#222,#111);
-  box-shadow:inset -3px 0 6px rgba(255,255,255,.15);
+  box-shadow:inset -3px 0 6px rgba(255,255,255,.2);
 }
 
 /* ===== PAGE AREA ===== */
-.page-area {
+.page-area{
   flex:1;
   position:relative;
   overflow:hidden;
+  background:#000;
   border-radius:10px;
-  background:black;
   box-shadow:0 25px 60px rgba(0,0,0,.8);
 }
 
-/* ===== PAGE ===== */
-.page {
-  position:absolute;
-  inset:0;
-  transform-origin:left center;
-  backface-visibility:hidden;
-  transition:transform .4s;
-}
-
-.page img {
+/* ===== IMAGE FIX ===== */
+.page-area img{
   width:100%;
   height:100%;
   object-fit:contain;
-  user-select:none;
+  object-position:center;
+  display:block;
+  background:black;
+}
+
+/* ===== DRAG PAGE ===== */
+#dragPage{
+  position:absolute;
+  inset:0;
+  transform-origin:left center;
   pointer-events:none;
+  backface-visibility:hidden;
 }
 
-/* ===== FLIP ===== */
-.flip {
-  transform:rotateY(-180deg);
+#dragPage img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:black;
 }
 
+/* ===== SHADOW ===== */
+#shadow{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(to left,rgba(0,0,0,.6),transparent);
+  opacity:0;
+  transition:opacity .1s;
+}
+
+/* ===== INDICATOR ===== */
+#indicator{
+  position:fixed;
+  bottom:12px;
+  width:100%;
+  text-align:center;
+  font-size:14px;
+  color:#ccc;
+}
+
+/* ===== MOBILE ===== */
+@media(max-width:700px){
+  #book{
+    width:96vw;
+    height:70vh;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<div class="toolbar">
-  <button onclick="prev()">⟵</button>
-  <button onclick="next()">⟶</button>
-</div>
+<div class="toolbar"></div>
 
 <div id="stage">
   <div id="book">
     <div class="page-area" id="left"></div>
     <div id="spine"></div>
     <div class="page-area" id="right"></div>
+
+    <div id="dragPage"></div>
+    <div id="shadow"></div>
   </div>
 </div>
 
+<div id="indicator"></div>
+
 <script>
-// ===== IMAGENS =====
+// ===== IMAGES =====
 const images = [
  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg",
  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/qNEexo_dNL8-0oCofAljcVJFCTV3ZNlV/bdDGeVS7xD1w9l9IcE0L6z8vmYH8FFbe/A9zTFht7a6E7ez6hREaW3YOtprh60w0u/Wi1bdshLwU4.jpg",
@@ -131,74 +155,90 @@ const images = [
 let index = 0;
 const left = document.getElementById("left");
 const right = document.getElementById("right");
+const dragPage = document.getElementById("dragPage");
+const shadow = document.getElementById("shadow");
+const indicator = document.getElementById("indicator");
+
+let dragging = false;
+let startX = 0;
+let velocity = 0;
+let lastMoveTime = 0;
 
 // ===== RENDER =====
 function render(){
   left.innerHTML = images[index-1] ? `<img src="${images[index-1]}">` : "";
   right.innerHTML = images[index] ? `<img src="${images[index]}">` : "";
+  indicator.innerText = `${index+1}-${Math.min(index+2,images.length)} / ${images.length}`;
 }
 
-// ===== NAV =====
-function next(){
-  if(index < images.length-1){
-    animateFlip(true);
-    index += 2;
-    setTimeout(render,400);
-  }
-}
-
-function prev(){
-  if(index > 0){
-    animateFlip(false);
-    index -= 2;
-    setTimeout(render,400);
-  }
-}
-
-// ===== FLIP ANIMATION =====
-function animateFlip(forward){
-  const page = document.createElement("div");
-  page.className = "page";
-  page.innerHTML = forward
-    ? `<img src="${images[index]}">`
-    : `<img src="${images[index-1]}">`;
-  right.appendChild(page);
-
-  requestAnimationFrame(()=>{
-    page.classList.add("flip");
-  });
-
-  setTimeout(()=>page.remove(),500);
-}
-
-// ===== DRAG SUPPORT =====
-let startX = 0;
-let dragging = false;
-
-right.addEventListener("mousedown", e=>{
+// ===== START DRAG =====
+function startDrag(x){
+  if(index >= images.length-1) return;
   dragging = true;
-  startX = e.clientX;
-});
+  startX = x;
+  velocity = 0;
+  lastMoveTime = Date.now();
+  dragPage.innerHTML = `<img src="${images[index]}">`;
+  shadow.style.opacity = 0.4;
+}
 
-window.addEventListener("mouseup", e=>{
+// ===== MOVE DRAG =====
+function moveDrag(x){
   if(!dragging) return;
-  const diff = e.clientX - startX;
+  const dx = x - startX;
+  const bookWidth = book.offsetWidth / 2;
+  let progress = Math.max(-bookWidth, Math.min(0, dx));
+  let angle = (progress / bookWidth) * 180;
+
+  dragPage.style.transform = `rotateY(${angle}deg)`;
+
+  const now = Date.now();
+  velocity = (x - startX) / (now - lastMoveTime + 1);
+  lastMoveTime = now;
+
+  shadow.style.opacity = Math.min(0.8, Math.abs(angle)/180);
+}
+
+// ===== END DRAG =====
+function endDrag(){
+  if(!dragging) return;
   dragging = false;
-  if(diff < -80) next();
-  if(diff > 80) prev();
-});
 
-// ===== TOUCH =====
-right.addEventListener("touchstart", e=>{
-  startX = e.touches[0].clientX;
-});
+  const inertia = velocity * 300;
 
-right.addEventListener("touchend", e=>{
-  const diff = e.changedTouches[0].clientX - startX;
-  if(diff < -80) next();
-  if(diff > 80) prev();
-});
+  if(inertia < -120){
+    flipNext();
+  } else {
+    dragPage.style.transform = `rotateY(0deg)`;
+    shadow.style.opacity = 0;
+  }
+}
 
+// ===== FLIP =====
+function flipNext(){
+  dragPage.style.transition = "transform .6s cubic-bezier(.2,.7,.3,1)";
+  dragPage.style.transform = "rotateY(-180deg)";
+  shadow.style.opacity = 0;
+
+  setTimeout(()=>{
+    dragPage.style.transition = "";
+    dragPage.style.transform = "";
+    dragPage.innerHTML = "";
+    index += 2;
+    render();
+  },600);
+}
+
+// ===== EVENTS =====
+right.addEventListener("mousedown", e=>startDrag(e.clientX));
+window.addEventListener("mousemove", e=>moveDrag(e.clientX));
+window.addEventListener("mouseup", endDrag);
+
+right.addEventListener("touchstart", e=>startDrag(e.touches[0].clientX));
+window.addEventListener("touchmove", e=>moveDrag(e.touches[0].clientX));
+window.addEventListener("touchend", endDrag);
+
+// ===== INIT =====
 render();
 </script>
 
