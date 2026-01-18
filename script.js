@@ -1,16 +1,11 @@
-// Links diretos do Google Drive (convertidos)
 const images = [
-  "https://drive.google.com/uc?export=view&id=13dcxn4CQBbtMYVZ-dTJemHrydBYoH2gZ",
-  "https://drive.google.com/uc?export=view&id=1RwR525NGVVn7kmevhPgE6GcgJmwmHQLK",
-  "https://drive.google.com/uc?export=view&id=10qdbXxFIYZgzG2zNTyAVCocvuPUX47Re",
-  "https://drive.google.com/uc?export=view&id=1CHwZ7aSmwJAYlSs_v966gHZ-5QsY2Ic3",
-  "https://drive.google.com/uc?export=view&id=1lCVuI86W9GcnHBq_WuHoCLFVPjpcPiuV"
+  "CAS00742.jpg"
 ];
 
 const bookElement = document.getElementById("book");
 const indicator = document.getElementById("page-indicator");
 
-// Função para criar as páginas do álbum
+// Criar páginas
 function createPages() {
   bookElement.innerHTML = "";
 
@@ -19,11 +14,10 @@ function createPages() {
     page.className = "page";
 
     const img = document.createElement("img");
-    img.src = src;
+    img.src = src;         // Caminho local
     img.loading = "lazy";
     img.alt = "Foto do álbum";
 
-    // Fallback visual caso a imagem falhe
     img.onerror = () => {
       img.alt = "Imagem indisponível";
       img.style.objectFit = "contain";
@@ -48,7 +42,7 @@ const pageFlip = new St.PageFlip(bookElement, {
   useMouseEvents: true
 });
 
-// Carregar páginas no PageFlip
+// Carregar páginas
 pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 
 // Botões de navegação
