@@ -30,7 +30,7 @@ body {
   justify-content:center;
   align-items:center;
   gap:16px;
-  z-index:50;
+  z-index:100;
   backdrop-filter: blur(8px);
 }
 
@@ -72,6 +72,28 @@ body {
   transform-style:preserve-3d;
 }
 
+/* ===== SPINE (LOMBADA) ===== */
+#spine {
+  position:absolute;
+  left:-22px;
+  top:0;
+  width:22px;
+  height:100%;
+  background:linear-gradient(
+    to right,
+    #050505,
+    #1a1a1a,
+    #2a2a2a,
+    #111
+  );
+  transform: rotateY(90deg);
+  transform-origin:right center;
+  border-radius:6px 0 0 6px;
+  box-shadow:
+    inset -2px 0 6px rgba(255,255,255,0.15),
+    0 0 20px rgba(0,0,0,0.8);
+}
+
 /* ===== PAGE ===== */
 .page {
   position:absolute;
@@ -94,7 +116,6 @@ body {
   height:100%;
   object-fit:contain;
   user-select:none;
-  pointer-events:auto;
 }
 
 /* ===== STATES ===== */
@@ -128,7 +149,7 @@ body {
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:200;
+  z-index:300;
 }
 
 #zoom img {
@@ -143,6 +164,10 @@ body {
     width:96vw;
     height:78vh;
   }
+  #spine {
+    left:-14px;
+    width:14px;
+  }
 }
 </style>
 </head>
@@ -156,7 +181,9 @@ body {
 </div>
 
 <div id="stage">
-  <div id="book"></div>
+  <div id="book">
+    <div id="spine"></div>
+  </div>
 </div>
 
 <div id="indicator"></div>
@@ -261,7 +288,6 @@ function handleSwipe(){
 
 // ===== INIT =====
 render();
-
 </script>
 
 </body>
