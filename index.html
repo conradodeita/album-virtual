@@ -1,31 +1,36 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <title>Álbum Virtual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS apenas para estrutura básica -->
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="viewer">
-  <button id="prev" class="nav">◀</button>
+  <div class="viewer">
+    <button id="prev">‹</button>
 
-  <div class="book" id="book">
-    <div class="stack left-stack"></div>
-
-    <div class="page-wrapper">
-      <div class="page left" id="left"></div>
-      <div class="page right" id="right"></div>
-    </div>
-
-    <div class="stack right-stack"></div>
-  </div>
-
-  <button id="next" class="nav">▶</button>
+```
+<div class="book">
+  <div id="left" class="page left"></div>
+  <div id="right" class="page right"></div>
 </div>
 
-<div class="counter" id="counter"></div>
+<button id="next">›</button>
+```
 
-<script src="script.js"></script>
+  </div>
+
+  <div id="counter"></div>
+
+  <!-- JS no final para garantir DOM carregado -->
+
+  <script src="script.js"></script>
+
 </body>
 </html>
