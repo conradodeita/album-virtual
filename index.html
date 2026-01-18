@@ -14,7 +14,6 @@ body{
   overflow:hidden;
 }
 
-/* ===== STAGE ===== */
 #stage{
   position:absolute;
   inset:0;
@@ -24,7 +23,6 @@ body{
   perspective:3500px;
 }
 
-/* ===== BOOK ===== */
 #book{
   width:min(94vw,1100px);
   aspect-ratio:2 / 1;
@@ -33,12 +31,10 @@ body{
   transform-style:preserve-3d;
 }
 
-/* ===== MOBILE ===== */
 body.mobile #book{
   aspect-ratio:1 / 1;
 }
 
-/* ===== PAGE ===== */
 .page{
   flex:1;
   background:#fff;
@@ -58,7 +54,6 @@ body.mobile #book{
   display:block;
 }
 
-/* ===== SPINE ===== */
 #spine{
   width:26px;
   background:linear-gradient(to right,#ddd,#f8f8f8,#ddd);
@@ -67,7 +62,6 @@ body.mobile #book{
     inset 3px 0 6px rgba(255,255,255,.7);
 }
 
-/* ===== DRAG PAGE ===== */
 #dragPage{
   position:absolute;
   top:0;
@@ -89,7 +83,6 @@ body.mobile #book{
   object-fit:contain;
 }
 
-/* Curvatura fake */
 #dragPage::after{
   content:"";
   position:absolute;
@@ -102,7 +95,6 @@ body.mobile #book{
   pointer-events:none;
 }
 
-/* ===== SHADOW ===== */
 #shadow{
   position:absolute;
   inset:0;
@@ -111,7 +103,6 @@ body.mobile #book{
   opacity:0;
 }
 
-/* ===== BUTTONS ===== */
 .nav-btn{
   position:fixed;
   top:50%;
@@ -129,7 +120,6 @@ body.mobile #book{
 
 body.mobile .nav-btn{ display:none; }
 
-/* ===== INDICATOR ===== */
 #indicator{
   position:fixed;
   bottom:14px;
@@ -161,13 +151,9 @@ body.mobile .nav-btn{ display:none; }
 
 <script>
 // ================= IMAGES =================
+// 👉 Agora usando sua imagem do GitHub Pages
 const images = [
- "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg",
- "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/qNEexo_dNL8-0oCofAljcVJFCTV3ZNlV/bdDGeVS7xD1w9l9IcE0L6z8vmYH8FFbe/A9zTFht7a6E7ez6hREaW3YOtprh60w0u/Wi1bdshLwU4.jpg",
- "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/Pw65VlFkMsO6lQV4CDlyrWsjXSkEz0Ah/c1i9ixp9Tg4A9hTDQdcO1Dxc_yoBdACL/FPfIlczoHtlqVb5752-w7QR0voXhMX9o/RQShPhBhB68.jpg",
- "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/zZqnEvAAIq6FvmDfHTFJsBgKq8WvL3nN/etBmGlCmqocfOuTYTj47VdmnJUlMdJQb/5pfWbmfSHzYVP2ZQTXxT0z3RwnNp6C5_/T83uCi3ltVc.jpg",
- "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/jiBuVFhkgxZMh4Wla0d04ExhZSW-9Y09/SZWHP4lTKay1zdNJyyl_XcVtWr2o6qxm/mpIIlAh7ux9fboPNVlRqOXz3N0GVMkMP/eVq_OU5Y-FU.jpg",
- "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/8gCM3saGL9vugTjFfIGW6HRjn6Ohg-Te/Z8J9OcgsHBZyJ6UI6sTsHRFqZFRF-a7M/bzylEzdicq9A1agfjdUp34Q1wfpHF8Eb/fGgeWxfcm1A.jpg"
+  "https://conradodeita.github.io/album-virtual/CAS00742.jpg"
 ];
 
 // ================= CORE =================
@@ -191,17 +177,9 @@ function detectMobile(){
 window.addEventListener("resize", detectMobile);
 detectMobile();
 
-// ================= IMAGE TAG FIX =================
+// ================= IMAGE TAG =================
 function imgTag(src){
-  return `
-    <img 
-      src="${src}"
-      loading="lazy"
-      referrerpolicy="no-referrer"
-      crossorigin="anonymous"
-      onerror="this.style.display='none'"
-    >
-  `;
+  return `<img src="${src}" loading="lazy">`;
 }
 
 // ================= RENDER =================
