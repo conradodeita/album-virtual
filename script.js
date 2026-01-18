@@ -1,4 +1,4 @@
-// Links diretos do Google Drive
+// Links diretos do Google Drive (convertidos)
 const images = [
   "https://drive.google.com/uc?export=view&id=13dcxn4CQBbtMYVZ-dTJemHrydBYoH2gZ",
   "https://drive.google.com/uc?export=view&id=1RwR525NGVVn7kmevhPgE6GcgJmwmHQLK",
@@ -10,7 +10,7 @@ const images = [
 const bookElement = document.getElementById("book");
 const indicator = document.getElementById("page-indicator");
 
-// Criar páginas
+// Função para criar as páginas do álbum
 function createPages() {
   bookElement.innerHTML = "";
 
@@ -23,7 +23,7 @@ function createPages() {
     img.loading = "lazy";
     img.alt = "Foto do álbum";
 
-    // Debug visual se imagem falhar
+    // Fallback visual caso a imagem falhe
     img.onerror = () => {
       img.alt = "Imagem indisponível";
       img.style.objectFit = "contain";
@@ -48,6 +48,7 @@ const pageFlip = new St.PageFlip(bookElement, {
   useMouseEvents: true
 });
 
+// Carregar páginas no PageFlip
 pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 
 // Botões de navegação
