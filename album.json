@@ -1,9 +1,44 @@
 [
-  { "type": "capa", "image": "imagens/capa.jpg" },
-  { "type": "single", "image": "imagens/01.jpg" },
-  { "type": "single", "image": "imagens/02.jpg" },
-  { "type": "spread", "image": "imagens/spread-03.jpg" },
-  { "type": "single", "image": "imagens/04.jpg" },
-  { "type": "single", "image": "imagens/05.jpg" },
-  { "type": "contracapa", "image": "imagens/contracapa.jpg" }
+  {
+    "type": "capa",
+    "image": "imagens/ELIAS DE CARVALHO FRAMIL COSTA - Capa 02_a.jpg"
+  },
+
+  { "type": "single", "image": "imagens/ANA CLARA DA SILVA MENDES 02.jpg" },
+  { "type": "single", "image": "imagens/CAS00742.jpg" },
+  { "type": "single", "image": "imagens/CAS01018.jpg" },
+  { "type": "single", "image": "imagens/CAS02101.jpg" },
+  { "type": "single", "image": "imagens/CAS07547-2.jpg" },
+  { "type": "single", "image": "imagens/CAS07916-2.jpg" },
+  { "type": "single", "image": "imagens/CAS08177.jpg" },
+  { "type": "single", "image": "imagens/CAS08238 (1).jpg" },
+  { "type": "single", "image": "imagens/CAS08646.jpg" },
+  { "type": "single", "image": "imagens/CAS08730.jpg" },
+  { "type": "single", "image": "imagens/CAS09026.jpg" },
+  { "type": "single", "image": "imagens/CAS09447.jpg" },
+
+  { "type": "single", "image": "imagens/DSC05580-2.jpg" },
+  { "type": "single", "image": "imagens/DSC05592 (1).jpg" },
+  { "type": "single", "image": "imagens/DSC09471.jpg" },
+  { "type": "single", "image": "imagens/DSC09611.jpg" },
+  { "type": "single", "image": "imagens/DSC09707-Editar.jpg" },
+  { "type": "single", "image": "imagens/DSC09908-2.jpg" },
+
+  { "type": "single", "image": "imagens/DiaDosPais-05418.jpg" },
+  { "type": "single", "image": "imagens/DiaDosPais-05817.jpg" },
+  { "type": "single", "image": "imagens/DiaDosPais-05831.jpg" },
+  { "type": "single", "image": "imagens/DiaDosPais-05840-2.jpg" },
+
+  { "type": "single", "image": "imagens/PEDRO PERRONI DA FONSECA 03_a.jpg" },
+
+  { "type": "single", "image": "imagens/g-08377.jpg" },
+  { "type": "single", "image": "imagens/g-09770.jpg" },
+
+  { "type": "single", "image": "imagens/ready-05582.jpg" },
+  { "type": "single", "image": "imagens/ready-06047.jpg" },
+
+  {
+    "type": "contracapa",
+    "image": "imagens/ELIAS DE CARVALHO FRAMIL COSTA - Estojo 01.jpg"
+  }
 ]
