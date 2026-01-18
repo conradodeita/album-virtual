@@ -134,6 +134,7 @@ body.mobile #book{
   color:#fff;
   cursor:pointer;
   backdrop-filter:blur(6px);
+  user-select:none;
 }
 
 #prevBtn{ left:20px; }
@@ -180,6 +181,7 @@ let dragging = false;
 let startX = 0;
 let velocity = 0;
 let lastTime = 0;
+let animating = false;
 
 const left = document.getElementById("left");
 const right = document.getElementById("right");
@@ -218,19 +220,24 @@ render();
 
 // ================= DRAG =================
 function startDrag(x){
+  if(animating) return;
   if(index >= images.length-1) return;
+
   dragging = true;
   startX = x;
   velocity = 0;
   lastTime = Date.now();
+
   dragPage.innerHTML = `<img src="${images[index]}">`;
   shadow.style.opacity = 0.4;
 }
 
 function moveDrag(x){
   if(!dragging) return;
+
   const dx = x - startX;
   const pageWidth = book.offsetWidth / 2;
+
   let progress = Math.max(-pageWidth, Math.min(0, dx));
   let angle = (progress / pageWidth) * 180;
 
@@ -249,6 +256,7 @@ function moveDrag(x){
 function endDrag(){
   if(!dragging) return;
   dragging = false;
+
   const inertia = velocity * 320;
 
   if(inertia < -120){
@@ -261,23 +269,37 @@ function endDrag(){
 
 // ================= FLIP =================
 function flipNext(){
+  if(animating) return;
+  if(index >= images.length-1) return;
+
+  animating = true;
+
+  dragPage.innerHTML = `<img src="${images[index]}">`;
   dragPage.style.transition = "transform .7s cubic-bezier(.2,.7,.2,1)";
   dragPage.style.transform = "rotateY(-180deg)";
-  shadow.style.opacity = 0;
+  shadow.style.opacity = 0.6;
 
   setTimeout(()=>{
     dragPage.style.transition = "";
     dragPage.style.transform = "";
     dragPage.innerHTML = "";
     index += document.body.classList.contains("mobile") ? 1 : 2;
+    animating = false;
     render();
   },700);
 }
 
 function flipPrev(){
+  if(animating) return;
+  if(index <= 0) return;
+
+  animating = true;
+
   index -= document.body.classList.contains("mobile") ? 1 : 2;
   if(index < 0) index = 0;
+
   render();
+  animating = false;
 }
 
 // ================= EVENTS =================
