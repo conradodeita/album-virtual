@@ -55,7 +55,7 @@ body.mobile #book{
   height:100%;
   object-fit:contain;
   background:#fff;
-  pointer-events:none;
+  display:block;
 }
 
 /* ===== SPINE ===== */
@@ -81,6 +81,12 @@ body.mobile #book{
   overflow:hidden;
   background:white;
   box-shadow:0 12px 30px rgba(0,0,0,.35);
+}
+
+#dragPage img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 
 /* Curvatura fake */
@@ -112,7 +118,7 @@ body.mobile #book{
   transform:translateY(-50%);
   padding:14px 18px;
   font-size:18px;
-  background:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.95);
   border:1px solid #ccc;
   border-radius:8px;
   cursor:pointer;
@@ -164,6 +170,30 @@ const images = [
  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/8gCM3saGL9vugTjFfIGW6HRjn6Ohg-Te/Z8J9OcgsHBZyJ6UI6sTsHRFqZFRF-a7M/bzylEzdicq9A1agfjdUp34Q1wfpHF8Eb/fGgeWxfcm1A.jpg"
 ];
 
+// ================= PRELOAD =================
+const loadedImages = [];
+let loadedCount = 0;
+
+images.forEach((src, i)=>{
+  const img = new Image();
+  img.onload = ()=>{
+    loadedImages[i] = src;
+    loadedCount++;
+    if(loadedCount === images.length){
+      render();
+    }
+  };
+  img.onerror = ()=>{
+    console.warn("Erro ao carregar imagem:", src);
+    loadedImages[i] = null;
+    loadedCount++;
+    if(loadedCount === images.length){
+      render();
+    }
+  };
+  img.src = src;
+});
+
 // ================= CORE =================
 let index = 0;
 let animating = false;
@@ -173,7 +203,6 @@ const right = document.getElementById("right");
 const dragPage = document.getElementById("dragPage");
 const shadow = document.getElementById("shadow");
 const indicator = document.getElementById("indicator");
-const book = document.getElementById("book");
 
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -181,31 +210,40 @@ const nextBtn = document.getElementById("nextBtn");
 // ================= MOBILE =================
 function detectMobile(){
   document.body.classList.toggle("mobile", window.innerWidth < 760);
+  render();
 }
 window.addEventListener("resize", detectMobile);
 detectMobile();
 
 // ================= RENDER =================
+function imgTag(src){
+  if(!src){
+    return `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;font-size:14px;">Imagem indisponível</div>`;
+  }
+  return `<img src="${src}" loading="lazy">`;
+}
+
 function render(){
+  if(!loadedImages.length) return;
+
   if(document.body.classList.contains("mobile")){
     left.innerHTML = "";
-    right.innerHTML = images[index] ? `<img src="${images[index]}">` : "";
-    indicator.innerText = `${index+1} / ${images.length}`;
+    right.innerHTML = imgTag(loadedImages[index]);
+    indicator.innerText = `${index+1} / ${loadedImages.length}`;
   }else{
-    left.innerHTML  = images[index-1] ? `<img src="${images[index-1]}">` : "";
-    right.innerHTML = images[index]   ? `<img src="${images[index]}">`   : "";
-    indicator.innerText = `${index+1}-${Math.min(index+2,images.length)} / ${images.length}`;
+    left.innerHTML  = imgTag(loadedImages[index-1]);
+    right.innerHTML = imgTag(loadedImages[index]);
+    indicator.innerText = `${index+1}-${Math.min(index+2,loadedImages.length)} / ${loadedImages.length}`;
   }
 }
-render();
 
 // ================= FLIP NEXT =================
 function flipNext(){
   if(animating) return;
-  if(index >= images.length-1) return;
+  if(index >= loadedImages.length-1) return;
   animating = true;
 
-  dragPage.innerHTML = `<img src="${images[index]}">`;
+  dragPage.innerHTML = imgTag(loadedImages[index]);
   dragPage.style.transition = "transform .7s cubic-bezier(.3,.8,.2,1)";
   dragPage.style.transform = "rotateY(-180deg)";
   shadow.style.opacity = 0.5;
@@ -225,13 +263,9 @@ function flipNext(){
 function flipPrev(){
   if(animating) return;
   if(index <= 0) return;
-  animating = true;
-
   index -= document.body.classList.contains("mobile") ? 1 : 2;
   if(index < 0) index = 0;
-
   render();
-  animating = false;
 }
 
 // ================= EVENTS =================
