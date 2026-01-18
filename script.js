@@ -1,3 +1,4 @@
+// Links diretos do Google Drive
 const images = [
   "https://drive.google.com/uc?export=view&id=13dcxn4CQBbtMYVZ-dTJemHrydBYoH2gZ",
   "https://drive.google.com/uc?export=view&id=1RwR525NGVVn7kmevhPgE6GcgJmwmHQLK",
@@ -49,11 +50,11 @@ const pageFlip = new St.PageFlip(bookElement, {
 
 pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 
-// Navegação
+// Botões de navegação
 document.getElementById("next").onclick = () => pageFlip.flipNext();
 document.getElementById("prev").onclick = () => pageFlip.flipPrev();
 
-// Indicador
+// Indicador de página
 pageFlip.on("flip", e => {
   const page = e.data + 1;
   const total = pageFlip.getPageCount();
