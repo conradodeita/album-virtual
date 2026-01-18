@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Álbum Virtual</title>
+  <title>Álbum Virtual Profissional</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- CSS -->
@@ -13,16 +13,22 @@
 </head>
 <body>
 
-<div class="app">
-  <button id="prev">◀</button>
+<div class="album-wrapper">
 
+  <!-- Botão anterior -->
+  <button id="prev" class="nav-btn">◀</button>
+
+  <!-- Livro -->
   <div id="book-container">
     <div id="book"></div>
   </div>
 
-  <button id="next">▶</button>
+  <!-- Botão próximo -->
+  <button id="next" class="nav-btn">▶</button>
+
 </div>
 
+<!-- Indicador de página -->
 <div id="page-indicator">1 / 1</div>
 
 <!-- JS -->
