@@ -19,7 +19,7 @@ body {
 
 #book-container {
   width: min(90vw, 900px);
-  aspect-ratio: 2 / 1; /* 60cm aberto x 30cm altura */
+  aspect-ratio: 2 / 1; /* aberto x altura */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,7 +44,7 @@ body {
 .page img {
   width: 100%;
   height: 100%;
-  object-fit: contain;   /* <<< NÃO CORTA A FOTO */
+  object-fit: contain;   /* não corta a foto */
   image-rendering: auto;
   background: #fff;
 }
