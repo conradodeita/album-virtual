@@ -1,0 +1,107 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.viewer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.book {
+  display: flex;
+  width: 940px;
+  height: 600px;
+  background: #fff;
+  perspective: 2200px;
+  box-shadow: 0 25px 50px rgba(0,0,0,.25);
+}
+
+.stack {
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(to right, #ddd, #f9f9f9);
+}
+
+.left-stack {
+  box-shadow: inset -10px 0 20px rgba(0,0,0,.15);
+}
+
+.right-stack {
+  box-shadow: inset 10px 0 20px rgba(0,0,0,.15);
+}
+
+.page-wrapper {
+  display: flex;
+  width: 860px;
+  height: 100%;
+  position: relative;
+}
+
+.page {
+  width: 50%;
+  height: 100%;
+  background-color: #fff;
+  background-size: cover;
+  background-position: center;
+  backface-visibility: hidden;
+}
+
+.page.left {
+  border-right: 1px solid #eee;
+}
+
+.page.right {
+  border-left: 1px solid #eee;
+}
+
+.page.turning {
+  transform-origin: left center;
+  animation: pageTurn .7s ease forwards;
+}
+
+@keyframes pageTurn {
+  0% {
+    transform: rotateY(0deg) translateX(0);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+  }
+  50% {
+    box-shadow: -20px 0 40px rgba(0,0,0,.35);
+  }
+  100% {
+    transform: rotateY(-180deg) translateX(-10px);
+  }
+}
+
+.nav {
+  background: #fff;
+  border: none;
+  font-size: 22px;
+  padding: 12px 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,.2);
+}
+
+.nav:hover {
+  background: #eee;
+}
+
+.counter {
+  margin-top: 14px;
+  color: #555;
+}
+
+.spread {
+  background-size: contain;
+}

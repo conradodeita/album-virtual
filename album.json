@@ -1,0 +1,9 @@
+[
+  { "type": "capa", "image": "imagens/capa.jpg" },
+  { "type": "single", "image": "imagens/01.jpg" },
+  { "type": "single", "image": "imagens/02.jpg" },
+  { "type": "spread", "image": "imagens/spread-03.jpg" },
+  { "type": "single", "image": "imagens/04.jpg" },
+  { "type": "single", "image": "imagens/05.jpg" },
+  { "type": "contracapa", "image": "imagens/contracapa.jpg" }
+]
