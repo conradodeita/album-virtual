@@ -1,218 +1,268 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
 <meta charset="UTF-8">
-<title>Álbum Virtual</title>
+<title>Álbum Virtual 3D</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
-/* ===== GLOBAL RESET ===== */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 body {
-  background: #070707;
-  color: #fff;
-  font-family: "Segoe UI", Arial, sans-serif;
-  overflow-x: hidden;
+  background: radial-gradient(circle at center, #111 0%, #000 70%);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow:hidden;
+  color:#fff;
 }
 
 /* ===== TOOLBAR ===== */
 .toolbar {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  padding: 12px;
-  background: #111;
-  border-bottom: 2px solid #222;
+  position:fixed;
+  top:0;
+  width:100%;
+  height:56px;
+  background:rgba(0,0,0,0.75);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:16px;
+  z-index:50;
+  backdrop-filter: blur(8px);
 }
 
 .toolbar button {
-  background: #222;
-  border: none;
-  padding: 10px 14px;
-  color: white;
-  font-size: 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all .2s;
+  background:#1e1e1e;
+  border:none;
+  color:#fff;
+  padding:10px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:15px;
+  transition:.2s;
 }
 
 .toolbar button:hover {
-  background: #333;
-  transform: scale(1.05);
+  background:#333;
+  transform:scale(1.05);
 }
 
-/* ===== ÁREA DO LIVRO ===== */
+/* ===== STAGE ===== */
 #stage {
-  width: 100%;
-  height: calc(100vh - 60px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 1800px;
+  position:absolute;
+  top:56px;
+  left:0;
+  width:100%;
+  height:calc(100vh - 56px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  perspective:2600px;
+  overflow:hidden;
 }
 
+/* ===== BOOK ===== */
 #book {
-  width: min(92vw, 640px);
-  height: min(80vh, 840px);
-  position: relative;
+  width:min(92vw,720px);
+  height:min(82vh,900px);
+  position:relative;
+  transform-style:preserve-3d;
 }
 
-/* ===== PÁGINAS ===== */
+/* ===== PAGE ===== */
 .page {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  border-radius: 8px;
-  box-shadow: 0 14px 45px rgba(0,0,0,0.6);
-  transform-origin: left center;
-  transition: transform .8s ease, z-index .8s ease;
-  overflow: hidden;
+  position:absolute;
+  inset:0;
+  background:#000;
+  border-radius:12px;
+  overflow:hidden;
+  transform-origin:left center;
+  backface-visibility:hidden;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.7),
+    inset -8px 0 12px rgba(255,255,255,0.06);
+  transition:
+    transform 1s cubic-bezier(.25,.8,.25,1),
+    z-index .8s;
 }
 
 .page img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  cursor: pointer;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  user-select:none;
+  pointer-events:auto;
 }
 
-/* ===== CLASSES ===== */
-.page.left {
+/* ===== STATES ===== */
+.page.flipped {
   transform: rotateY(-180deg);
-  z-index: 0 !important;
 }
 
-.page.right {
-  z-index: 9 !important;
+.page.current {
+  z-index:50;
 }
 
-.page.center {
-  z-index: 8 !important;
+.page.behind {
+  z-index:1;
 }
 
-/* ===== INDICADOR ===== */
-#pageIndicator {
-  text-align: center;
-  padding-top: 6px;
-  font-size: 14px;
-  color: #ccc;
+/* ===== INDICATOR ===== */
+#indicator {
+  position:fixed;
+  bottom:14px;
+  width:100%;
+  text-align:center;
+  font-size:14px;
+  color:#ccc;
 }
 
 /* ===== ZOOM ===== */
-#zoomModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.93);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+#zoom {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.95);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:200;
 }
 
-#zoomModal img {
-  max-width: 95%;
-  max-height: 95%;
-  cursor: zoom-out;
+#zoom img {
+  max-width:95%;
+  max-height:95%;
+  cursor:zoom-out;
 }
 
+/* ===== MOBILE ===== */
+@media(max-width:600px){
+  #book {
+    width:96vw;
+    height:78vh;
+  }
+}
 </style>
 </head>
 
 <body>
 
 <div class="toolbar">
-  <button onclick="prevPage()">⟵ Anterior</button>
-  <button onclick="nextPage()">Próxima ⟶</button>
-  <button onclick="toggleFullscreen()">🖵 Tela Cheia</button>
+  <button onclick="prev()">⟵</button>
+  <button onclick="next()">⟶</button>
+  <button onclick="toggleFullscreen()">🖥</button>
 </div>
 
 <div id="stage">
   <div id="book"></div>
 </div>
 
-<div id="pageIndicator"></div>
+<div id="indicator"></div>
 
-<div id="zoomModal" onclick="closeZoom()">
-  <img id="zoomImage">
+<div id="zoom" onclick="closeZoom()">
+  <img id="zoomImg">
 </div>
 
 <script>
-// ===== IMAGENS DO ÁLBUM =====
+// ===== IMAGENS =====
 const images = [
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg",
-
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/qNEexo_dNL8-0oCofAljcVJFCTV3ZNlV/bdDGeVS7xD1w9l9IcE0L6z8vmYH8FFbe/A9zTFht7a6E7ez6hREaW3YOtprh60w0u/Wi1bdshLwU4.jpg",
-
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/Pw65VlFkMsO6lQV4CDlyrWsjXSkEz0Ah/c1i9ixp9Tg4A9hTDQdcO1Dxc_yoBdACL/FPfIlczoHtlqVb5752-w7QR0voXhMX9o/RQShPhBhB68.jpg",
-
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/zZqnEvAAIq6FvmDfHTFJsBgKq8WvL3nN/etBmGlCmqocfOuTYTj47VdmnJUlMdJQb/5pfWbmfSHzYVP2ZQTXxT0z3RwnNp6C5_/T83uCi3ltVc.jpg",
-
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/jiBuVFhkgxZMh4Wla0d04ExhZSW-9Y09/SZWHP4lTKay1zdNJyyl_XcVtWr2o6qxm/mpIIlAh7ux9fboPNVlRqOXz3N0GVMkMP/eVq_OU5Y-FU.jpg",
-
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/8gCM3saGL9vugTjFfIGW6HRjn6Ohg-Te/Z8J9OcgsHBZyJ6UI6sTsHRFqZFRF-a7M/bzylEzdicq9A1agfjdUp34Q1wfpHF8Eb/fGgeWxfcm1A.jpg",
-
-  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/e3HkNKPh5OqI4T4PYUEFR0zzPbBA8PBB/IlBpfiue1_ALoFp_3RBlUp5V4kCwsQ3q/tk-pFB0oWzVexZlmuqVzvh4Wbp75Zjyz/-_FFkk8xOXI.jpg",
-
-  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg"
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/e3HkNKPh5OqI4T4PYUEFR0zzPbBA8PBB/IlBpfiue1_ALoFp_3RBlUp5V4kCwsQ3q/tk-pFB0oWzVexZlmuqVzvh4Wbp75Zjyz/-_FFkk8xOXI.jpg"
 ];
 
-let current = 0;
 const book = document.getElementById("book");
-const indicator = document.getElementById("pageIndicator");
+const indicator = document.getElementById("indicator");
+let current = 0;
 
-// Cria páginas
+// ===== CREATE PAGES =====
 images.forEach((src, i) => {
-  const p = document.createElement("div");
-  p.className = "page";
-  p.style.zIndex = images.length - i;
-  p.innerHTML = `<img src="${src}" onclick="openZoom('${src}')">`;
-  book.appendChild(p);
+  const page = document.createElement("div");
+  page.className = "page";
+  page.style.zIndex = images.length - i;
+  page.innerHTML = `<img src="${src}" draggable="false">`;
+  page.onclick = () => openZoom(src);
+  book.appendChild(page);
 });
 
-// Atualiza visual
-function update() {
-  const pages = [...document.querySelectorAll('.page')];
-  pages.forEach((pg, index) => {
-    pg.className = "page";
-    if (index < current) pg.classList.add("left");
-    else if (index === current) pg.classList.add("center");
-    else pg.classList.add("right");
+// ===== UPDATE =====
+function render() {
+  const pages = document.querySelectorAll(".page");
+  pages.forEach((p, i) => {
+    p.classList.remove("flipped","current","behind");
+
+    if(i < current) p.classList.add("flipped","behind");
+    else if(i === current) p.classList.add("current");
   });
 
-  indicator.textContent = `Página ${current + 1} de ${images.length}`;
+  indicator.innerText = `Página ${current + 1} de ${images.length}`;
 }
 
-// Navegação
-function nextPage() { if (current < images.length - 1) current++; update(); }
-function prevPage() { if (current > 0) current--; update(); }
-
-// Zoom
-function openZoom(src) {
-  document.getElementById("zoomImage").src = src;
-  document.getElementById("zoomModal").style.display = "flex";
-}
-function closeZoom() {
-  document.getElementById("zoomModal").style.display = "none";
+// ===== NAVIGATION =====
+function next() {
+  if(current < images.length - 1) {
+    current++;
+    render();
+  }
 }
 
-// Fullscreen
-function toggleFullscreen() {
-  if (!document.fullscreenElement)
+function prev() {
+  if(current > 0) {
+    current--;
+    render();
+  }
+}
+
+// ===== ZOOM =====
+function openZoom(src){
+  document.getElementById("zoomImg").src = src;
+  document.getElementById("zoom").style.display = "flex";
+}
+
+function closeZoom(){
+  document.getElementById("zoom").style.display = "none";
+}
+
+// ===== FULLSCREEN =====
+function toggleFullscreen(){
+  if(!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
-  else
+  } else {
     document.exitFullscreen();
+  }
 }
 
-update();
+// ===== SWIPE SUPPORT =====
+let startX = 0;
+let endX = 0;
+
+book.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+book.addEventListener("touchend", e => {
+  endX = e.changedTouches[0].clientX;
+  handleSwipe();
+});
+
+function handleSwipe(){
+  const diff = startX - endX;
+  if(Math.abs(diff) > 50){
+    if(diff > 0) next();
+    else prev();
+  }
+}
+
+// ===== INIT =====
+render();
 
 </script>
+
 </body>
 </html>
