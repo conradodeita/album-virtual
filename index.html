@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Flipbook Realista 30x60</title>
+<title>Álbum 3D Realista</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -26,49 +26,52 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  perspective:3000px;
+  perspective:3500px;
 }
 
 /* ===== BOOK ===== */
-/* Proporção EXATA: 2:1 (60cm x 30cm aberto) */
 #book{
-  width:min(92vw,1000px);
+  width:min(92vw,1100px);
   aspect-ratio:2 / 1;
   position:relative;
   display:flex;
   transform-style:preserve-3d;
 }
 
-/* ===== PAGE AREA ===== */
-/* Cada página é QUADRADA */
-.page-area{
-  flex:1;
+/* ===== MOBILE MODE ===== */
+body.mobile #book{
   aspect-ratio:1 / 1;
+}
+
+/* ===== PAGE ===== */
+.page{
+  flex:1;
   position:relative;
   overflow:hidden;
   background:#000;
-  border-radius:10px;
-  box-shadow:0 20px 50px rgba(0,0,0,.8);
+  border-radius:12px;
+  box-shadow:0 25px 60px rgba(0,0,0,.85);
+}
+
+.page img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  user-select:none;
+  pointer-events:none;
 }
 
 /* ===== SPINE ===== */
 #spine{
-  width:28px;
-  background:linear-gradient(to right,#050505,#222,#111);
-  box-shadow:inset -3px 0 6px rgba(255,255,255,.15);
-}
-
-/* ===== IMAGE FIX ===== */
-.page-area img,
-#dragPage img{
-  width:100%;
-  height:100%;
-  object-fit:cover;   /* Preenche como álbum real */
-  object-position:center;
-  display:block;
-  user-select:none;
-  pointer-events:none;
-  background:black;
+  width:30px;
+  background:
+    linear-gradient(to right,
+      #000 0%,
+      #333 50%,
+      #000 100%);
+  box-shadow:
+    inset -4px 0 8px rgba(255,255,255,.2),
+    inset 4px 0 12px rgba(0,0,0,.9);
 }
 
 /* ===== DRAG PAGE ===== */
@@ -82,6 +85,21 @@ body{
   pointer-events:none;
   backface-visibility:hidden;
   overflow:hidden;
+  border-radius:12px;
+}
+
+/* Curvatura fake mesh */
+#dragPage::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(120deg,
+      rgba(255,255,255,.25),
+      rgba(255,255,255,0) 40%,
+      rgba(0,0,0,.4) 70%);
+  mix-blend-mode:overlay;
+  pointer-events:none;
 }
 
 /* ===== SHADOW ===== */
@@ -89,37 +107,54 @@ body{
   position:absolute;
   inset:0;
   pointer-events:none;
-  background:linear-gradient(to left,rgba(0,0,0,.65),transparent);
+  background:linear-gradient(to left,rgba(0,0,0,.7),transparent);
   opacity:0;
-  transition:opacity .1s;
 }
 
 /* ===== INDICATOR ===== */
 #indicator{
   position:fixed;
-  bottom:14px;
+  bottom:16px;
   width:100%;
   text-align:center;
   font-size:14px;
   color:#ccc;
 }
 
-/* ===== MOBILE ===== */
-@media(max-width:720px){
-  #book{
-    width:96vw;
-  }
+/* ===== BUTTONS ===== */
+.nav-btn{
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+  padding:14px 18px;
+  font-size:18px;
+  background:rgba(0,0,0,.6);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;
+  color:#fff;
+  cursor:pointer;
+  backdrop-filter:blur(6px);
+}
+
+#prevBtn{ left:20px; }
+#nextBtn{ right:20px; }
+
+body.mobile .nav-btn{
+  display:none;
 }
 </style>
 </head>
 
 <body>
 
+<button id="prevBtn" class="nav-btn">◀</button>
+<button id="nextBtn" class="nav-btn">▶</button>
+
 <div id="stage">
   <div id="book">
-    <div class="page-area" id="left"></div>
+    <div class="page" id="left"></div>
     <div id="spine"></div>
-    <div class="page-area" id="right"></div>
+    <div class="page" id="right"></div>
 
     <div id="dragPage"></div>
     <div id="shadow"></div>
@@ -129,7 +164,7 @@ body{
 <div id="indicator"></div>
 
 <script>
-// ===== IMAGES =====
+// ================= IMAGES =================
 const images = [
  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg",
  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/qNEexo_dNL8-0oCofAljcVJFCTV3ZNlV/bdDGeVS7xD1w9l9IcE0L6z8vmYH8FFbe/A9zTFht7a6E7ez6hREaW3YOtprh60w0u/Wi1bdshLwU4.jpg",
@@ -139,7 +174,13 @@ const images = [
  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/8gCM3saGL9vugTjFfIGW6HRjn6Ohg-Te/Z8J9OcgsHBZyJ6UI6sTsHRFqZFRF-a7M/bzylEzdicq9A1agfjdUp34Q1wfpHF8Eb/fGgeWxfcm1A.jpg"
 ];
 
+// ================= CORE =================
 let index = 0;
+let dragging = false;
+let startX = 0;
+let velocity = 0;
+let lastTime = 0;
+
 const left = document.getElementById("left");
 const right = document.getElementById("right");
 const dragPage = document.getElementById("dragPage");
@@ -147,56 +188,68 @@ const shadow = document.getElementById("shadow");
 const indicator = document.getElementById("indicator");
 const book = document.getElementById("book");
 
-let dragging = false;
-let startX = 0;
-let velocity = 0;
-let lastMoveTime = 0;
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
 
-// ===== RENDER =====
-function render(){
-  left.innerHTML  = images[index-1] ? `<img src="${images[index-1]}">` : "";
-  right.innerHTML = images[index]   ? `<img src="${images[index]}">`   : "";
-  indicator.innerText = `${index+1}-${Math.min(index+2,images.length)} / ${images.length}`;
+// ================= MOBILE DETECT =================
+function detectMobile(){
+  if(window.innerWidth < 760){
+    document.body.classList.add("mobile");
+  }else{
+    document.body.classList.remove("mobile");
+  }
 }
+window.addEventListener("resize", detectMobile);
+detectMobile();
 
-// ===== START DRAG =====
+// ================= RENDER =================
+function render(){
+  if(document.body.classList.contains("mobile")){
+    left.innerHTML = "";
+    right.innerHTML = images[index] ? `<img src="${images[index]}">` : "";
+    indicator.innerText = `${index+1} / ${images.length}`;
+  }else{
+    left.innerHTML  = images[index-1] ? `<img src="${images[index-1]}">` : "";
+    right.innerHTML = images[index]   ? `<img src="${images[index]}">`   : "";
+    indicator.innerText = `${index+1}-${Math.min(index+2,images.length)} / ${images.length}`;
+  }
+}
+render();
+
+// ================= DRAG =================
 function startDrag(x){
   if(index >= images.length-1) return;
-
   dragging = true;
   startX = x;
   velocity = 0;
-  lastMoveTime = Date.now();
-
+  lastTime = Date.now();
   dragPage.innerHTML = `<img src="${images[index]}">`;
-  shadow.style.opacity = 0.35;
+  shadow.style.opacity = 0.4;
 }
 
-// ===== MOVE DRAG =====
 function moveDrag(x){
   if(!dragging) return;
-
   const dx = x - startX;
   const pageWidth = book.offsetWidth / 2;
-
   let progress = Math.max(-pageWidth, Math.min(0, dx));
   let angle = (progress / pageWidth) * 180;
 
-  dragPage.style.transform = `rotateY(${angle}deg)`;
+  dragPage.style.transform = `
+    rotateY(${angle}deg)
+    skewY(${angle/25}deg)
+  `;
 
   const now = Date.now();
-  velocity = (x - startX) / (now - lastMoveTime + 1);
-  lastMoveTime = now;
+  velocity = (x - startX) / (now - lastTime + 1);
+  lastTime = now;
 
-  shadow.style.opacity = Math.min(0.85, Math.abs(angle)/180);
+  shadow.style.opacity = Math.min(0.9, Math.abs(angle)/160);
 }
 
-// ===== END DRAG =====
 function endDrag(){
   if(!dragging) return;
   dragging = false;
-
-  const inertia = velocity * 300;
+  const inertia = velocity * 320;
 
   if(inertia < -120){
     flipNext();
@@ -206,9 +259,9 @@ function endDrag(){
   }
 }
 
-// ===== FLIP =====
+// ================= FLIP =================
 function flipNext(){
-  dragPage.style.transition = "transform .6s cubic-bezier(.2,.7,.3,1)";
+  dragPage.style.transition = "transform .7s cubic-bezier(.2,.7,.2,1)";
   dragPage.style.transform = "rotateY(-180deg)";
   shadow.style.opacity = 0;
 
@@ -216,12 +269,18 @@ function flipNext(){
     dragPage.style.transition = "";
     dragPage.style.transform = "";
     dragPage.innerHTML = "";
-    index += 2;
+    index += document.body.classList.contains("mobile") ? 1 : 2;
     render();
-  },600);
+  },700);
 }
 
-// ===== EVENTS =====
+function flipPrev(){
+  index -= document.body.classList.contains("mobile") ? 1 : 2;
+  if(index < 0) index = 0;
+  render();
+}
+
+// ================= EVENTS =================
 right.addEventListener("mousedown", e=>startDrag(e.clientX));
 window.addEventListener("mousemove", e=>moveDrag(e.clientX));
 window.addEventListener("mouseup", endDrag);
@@ -230,8 +289,8 @@ right.addEventListener("touchstart", e=>startDrag(e.touches[0].clientX));
 window.addEventListener("touchmove", e=>moveDrag(e.touches[0].clientX));
 window.addEventListener("touchend", endDrag);
 
-// ===== INIT =====
-render();
+nextBtn.onclick = flipNext;
+prevBtn.onclick = flipPrev;
 </script>
 
 </body>
