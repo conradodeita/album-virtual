@@ -1,240 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Álbum Virtual Realista</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Álbum Virtual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
+  <link rel="stylesheet" href="style.css">
 
-body{
-  background:#eaeaea;
-  font-family:Arial,Helvetica,sans-serif;
-  overflow:hidden;
-}
-
-#stage{
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  perspective:3200px;
-}
-
-#book{
-  width:min(92vw,1100px);
-  aspect-ratio:2 / 1;
-  position:relative;
-  display:flex;
-  transform-style:preserve-3d;
-}
-
-body.mobile #book{
-  aspect-ratio:1 / 1;
-}
-
-.page{
-  flex:1;
-  background:#fff;
-  border-radius:12px;
-  overflow:hidden;
-  position:relative;
-  box-shadow:
-    0 12px 28px rgba(0,0,0,.25),
-    inset 0 0 0 1px #e0e0e0;
-}
-
-.page img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  background:#fff;
-  display:block;
-}
-
-#spine{
-  width:28px;
-  background:linear-gradient(to right,#ccc,#f5f5f5,#ccc);
-  box-shadow:
-    inset -4px 0 8px rgba(0,0,0,.15),
-    inset 4px 0 8px rgba(255,255,255,.6);
-}
-
-/* Página animada */
-#dragPage{
-  position:absolute;
-  top:0;
-  right:0;
-  width:50%;
-  height:100%;
-  transform-origin:left center;
-  pointer-events:none;
-  backface-visibility:hidden;
-  border-radius:12px;
-  overflow:hidden;
-  background:white;
-  box-shadow:0 18px 40px rgba(0,0,0,.35);
-}
-
-#dragPage img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-
-/* Curvatura fake */
-#dragPage::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    linear-gradient(120deg,
-      rgba(255,255,255,.9),
-      rgba(255,255,255,0) 40%,
-      rgba(0,0,0,.28) 80%);
-  pointer-events:none;
-}
-
-/* Sombra dinâmica */
-#shadow{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:linear-gradient(to left,rgba(0,0,0,.4),transparent);
-  opacity:0;
-}
-
-/* Botões */
-.nav-btn{
-  position:fixed;
-  top:50%;
-  transform:translateY(-50%);
-  padding:14px 18px;
-  font-size:18px;
-  background:#fff;
-  border:1px solid #ccc;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-#prevBtn{ left:18px; }
-#nextBtn{ right:18px; }
-
-body.mobile .nav-btn{ display:none; }
-
-#indicator{
-  position:fixed;
-  bottom:14px;
-  width:100%;
-  text-align:center;
-  font-size:14px;
-  color:#444;
-}
-</style>
+  <!-- PageFlip local -->
+  <script src="page-flip.browser.min.js"></script>
 </head>
-
 <body>
 
-<button id="prevBtn" class="nav-btn">◀</button>
-<button id="nextBtn" class="nav-btn">▶</button>
+<div class="app">
 
-<div id="stage">
-  <div id="book">
-    <div class="page" id="left"></div>
-    <div id="spine"></div>
-    <div class="page" id="right"></div>
+  <button id="prev">◀</button>
 
-    <div id="dragPage"></div>
-    <div id="shadow"></div>
+  <div id="book-container">
+    <div id="book"></div>
   </div>
+
+  <button id="next">▶</button>
+
 </div>
 
-<div id="indicator"></div>
+<div id="page-indicator">1 / 1</div>
 
-<script>
-// ================= IMAGES =================
-const images = [
-  "CAS00742.jpg"
-];
-
-// ================= CORE =================
-let index = 0;
-let animating = false;
-
-const left = document.getElementById("left");
-const right = document.getElementById("right");
-const dragPage = document.getElementById("dragPage");
-const shadow = document.getElementById("shadow");
-const indicator = document.getElementById("indicator");
-
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-
-// ================= MOBILE =================
-function detectMobile(){
-  document.body.classList.toggle("mobile", window.innerWidth < 760);
-  render();
-}
-window.addEventListener("resize", detectMobile);
-detectMobile();
-
-// ================= IMAGE TAG =================
-function imgTag(src){
-  return `<img src="${src}" loading="lazy">`;
-}
-
-// ================= RENDER =================
-function render(){
-  if(document.body.classList.contains("mobile")){
-    left.innerHTML = "";
-    right.innerHTML = imgTag(images[index]);
-    indicator.innerText = `${index+1} / ${images.length}`;
-  }else{
-    left.innerHTML  = imgTag(images[index-1]);
-    right.innerHTML = imgTag(images[index]);
-    indicator.innerText = `${index+1}-${Math.min(index+2,images.length)} / ${images.length}`;
-  }
-}
-
-// ================= FLIP NEXT =================
-function flipNext(){
-  if(animating) return;
-  if(index >= images.length-1) return;
-  animating = true;
-
-  dragPage.innerHTML = imgTag(images[index]);
-  dragPage.style.transition = "transform .7s cubic-bezier(.3,.8,.2,1)";
-  dragPage.style.transform = "rotateY(-180deg)";
-  shadow.style.opacity = 0.5;
-
-  setTimeout(()=>{
-    dragPage.style.transition = "";
-    dragPage.style.transform = "";
-    dragPage.innerHTML = "";
-    index += document.body.classList.contains("mobile") ? 1 : 2;
-    shadow.style.opacity = 0;
-    animating = false;
-    render();
-  },700);
-}
-
-// ================= FLIP PREV =================
-function flipPrev(){
-  if(animating) return;
-  if(index <= 0) return;
-  index -= document.body.classList.contains("mobile") ? 1 : 2;
-  if(index < 0) index = 0;
-  render();
-}
-
-// ================= EVENTS =================
-nextBtn.onclick = flipNext;
-prevBtn.onclick = flipPrev;
-
-render();
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
