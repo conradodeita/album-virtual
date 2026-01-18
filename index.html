@@ -9,7 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-  background:#e5e5e5;
+  background:#eaeaea;
   font-family:Arial,Helvetica,sans-serif;
   overflow:hidden;
 }
@@ -20,11 +20,11 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  perspective:3500px;
+  perspective:3200px;
 }
 
 #book{
-  width:min(94vw,1100px);
+  width:min(92vw,1100px);
   aspect-ratio:2 / 1;
   position:relative;
   display:flex;
@@ -38,12 +38,12 @@ body.mobile #book{
 .page{
   flex:1;
   background:#fff;
-  border-radius:10px;
+  border-radius:12px;
   overflow:hidden;
   position:relative;
   box-shadow:
-    0 8px 25px rgba(0,0,0,.25),
-    inset 0 0 0 1px #ddd;
+    0 12px 28px rgba(0,0,0,.25),
+    inset 0 0 0 1px #e0e0e0;
 }
 
 .page img{
@@ -55,13 +55,14 @@ body.mobile #book{
 }
 
 #spine{
-  width:26px;
-  background:linear-gradient(to right,#ddd,#f8f8f8,#ddd);
+  width:28px;
+  background:linear-gradient(to right,#ccc,#f5f5f5,#ccc);
   box-shadow:
-    inset -3px 0 6px rgba(0,0,0,.15),
-    inset 3px 0 6px rgba(255,255,255,.7);
+    inset -4px 0 8px rgba(0,0,0,.15),
+    inset 4px 0 8px rgba(255,255,255,.6);
 }
 
+/* Página animada */
 #dragPage{
   position:absolute;
   top:0;
@@ -71,10 +72,10 @@ body.mobile #book{
   transform-origin:left center;
   pointer-events:none;
   backface-visibility:hidden;
-  border-radius:10px;
+  border-radius:12px;
   overflow:hidden;
   background:white;
-  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  box-shadow:0 18px 40px rgba(0,0,0,.35);
 }
 
 #dragPage img{
@@ -83,33 +84,36 @@ body.mobile #book{
   object-fit:contain;
 }
 
+/* Curvatura fake */
 #dragPage::after{
   content:"";
   position:absolute;
   inset:0;
   background:
-    linear-gradient(115deg,
+    linear-gradient(120deg,
       rgba(255,255,255,.9),
       rgba(255,255,255,0) 40%,
-      rgba(0,0,0,.25) 75%);
+      rgba(0,0,0,.28) 80%);
   pointer-events:none;
 }
 
+/* Sombra dinâmica */
 #shadow{
   position:absolute;
   inset:0;
   pointer-events:none;
-  background:linear-gradient(to left,rgba(0,0,0,.45),transparent);
+  background:linear-gradient(to left,rgba(0,0,0,.4),transparent);
   opacity:0;
 }
 
+/* Botões */
 .nav-btn{
   position:fixed;
   top:50%;
   transform:translateY(-50%);
   padding:14px 18px;
   font-size:18px;
-  background:rgba(255,255,255,.95);
+  background:#fff;
   border:1px solid #ccc;
   border-radius:8px;
   cursor:pointer;
@@ -151,9 +155,8 @@ body.mobile .nav-btn{ display:none; }
 
 <script>
 // ================= IMAGES =================
-// 👉 Agora usando sua imagem do GitHub Pages
 const images = [
-  "https://conradodeita.github.io/album-virtual/CAS00742.jpg"
+  "CAS00742.jpg"
 ];
 
 // ================= CORE =================
