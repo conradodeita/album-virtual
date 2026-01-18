@@ -1,92 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 <meta charset="UTF-8">
 <title>Álbum Virtual</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
+
+/* ===== GLOBAL RESET ===== */
+* {
   margin: 0;
-  background: radial-gradient(circle at top, #222, #000);
-  font-family: Arial, sans-serif;
-  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-#app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+body {
+  background: #070707;
+  color: #fff;
+  font-family: "Segoe UI", Arial, sans-serif;
+  overflow-x: hidden;
 }
 
+/* ===== TOOLBAR ===== */
 .toolbar {
-  padding: 12px;
-  background: linear-gradient(#000, #111);
   display: flex;
-  gap: 12px;
   justify-content: center;
+  gap: 16px;
+  padding: 12px;
+  background: #111;
+  border-bottom: 2px solid #222;
 }
 
 .toolbar button {
-  background: #1e1e1e;
+  background: #222;
   border: none;
+  padding: 10px 14px;
   color: white;
-  padding: 10px 18px;
-  cursor: pointer;
-  border-radius: 6px;
   font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .2s;
 }
 
 .toolbar button:hover {
   background: #333;
+  transform: scale(1.05);
 }
 
+/* ===== ÁREA DO LIVRO ===== */
 #stage {
-  flex: 1;
+  width: 100%;
+  height: calc(100vh - 60px);
   display: flex;
   justify-content: center;
   align-items: center;
-  perspective: 2000px;
+  perspective: 1800px;
 }
 
 #book {
-  width: min(90vw, 520px);
-  height: min(85vh, 700px);
+  width: min(92vw, 640px);
+  height: min(80vh, 840px);
   position: relative;
 }
 
+/* ===== PÁGINAS ===== */
 .page {
   position: absolute;
-  inset: 0;
+  width: 100%;
+  height: 100%;
   background: #000;
-  border-radius: 6px;
-  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 14px 45px rgba(0,0,0,0.6);
   transform-origin: left center;
-  transition: transform 0.9s ease, z-index 0.9s;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  transition: transform .8s ease, z-index .8s ease;
+  overflow: hidden;
 }
 
 .page img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  cursor: zoom-in;
-  background: black;
+  cursor: pointer;
 }
 
-.page.flipped {
+/* ===== CLASSES ===== */
+.page.left {
   transform: rotateY(-180deg);
+  z-index: 0 !important;
 }
 
-.page.hidden {
-  display: none;
+.page.right {
+  z-index: 9 !important;
 }
 
-/* Zoom */
+.page.center {
+  z-index: 8 !important;
+}
+
+/* ===== INDICADOR ===== */
+#pageIndicator {
+  text-align: center;
+  padding-top: 6px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* ===== ZOOM ===== */
 #zoomModal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.92);
+  background: rgba(0,0,0,0.93);
   display: none;
   justify-content: center;
   align-items: center;
@@ -98,30 +122,31 @@ body {
   max-height: 95%;
   cursor: zoom-out;
 }
+
 </style>
 </head>
 
 <body>
 
-<div id="app">
-  <div class="toolbar">
-    <button onclick="prevPage()">⬅️ Anterior</button>
-    <button onclick="nextPage()">Próxima ➡️</button>
-    <button onclick="toggleFullscreen()">🖥️ Tela cheia</button>
-  </div>
-
-  <div id="stage">
-    <div id="book"></div>
-  </div>
+<div class="toolbar">
+  <button onclick="prevPage()">⟵ Anterior</button>
+  <button onclick="nextPage()">Próxima ⟶</button>
+  <button onclick="toggleFullscreen()">🖵 Tela Cheia</button>
 </div>
+
+<div id="stage">
+  <div id="book"></div>
+</div>
+
+<div id="pageIndicator"></div>
 
 <div id="zoomModal" onclick="closeZoom()">
   <img id="zoomImage">
 </div>
 
 <script>
+// ===== IMAGENS DO ÁLBUM =====
 const images = [
-  // CAPA
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg",
 
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/qNEexo_dNL8-0oCofAljcVJFCTV3ZNlV/bdDGeVS7xD1w9l9IcE0L6z8vmYH8FFbe/A9zTFht7a6E7ez6hREaW3YOtprh60w0u/Wi1bdshLwU4.jpg",
@@ -134,69 +159,60 @@ const images = [
 
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/8gCM3saGL9vugTjFfIGW6HRjn6Ohg-Te/Z8J9OcgsHBZyJ6UI6sTsHRFqZFRF-a7M/bzylEzdicq9A1agfjdUp34Q1wfpHF8Eb/fGgeWxfcm1A.jpg",
 
-  // CONTRACAPA
+  "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/e3HkNKPh5OqI4T4PYUEFR0zzPbBA8PBB/IlBpfiue1_ALoFp_3RBlUp5V4kCwsQ3q/tk-pFB0oWzVexZlmuqVzvh4Wbp75Zjyz/-_FFkk8xOXI.jpg",
+
   "https://static.wfolio.com/file/AqiFFw_TXMM4LDwoI2TPSYAM1lHVLAGB/F3eUE25SDaCuzHhNj6Pu6JOqhHkcmUkD/y5OULgSkTfmEFevVH6Sf_loR35892Czc/Dy85mrv_jbZUp1onboKxfJJyYVSz1JUI/U4y1x4H6X9pCsFBn2RAH-qGGC4IFVPta/uWbrLQxih0WNi86HfJcUhzy8Oli73U59.jpg"
 ];
 
+let current = 0;
 const book = document.getElementById("book");
-let currentPage = 0;
-const pages = [];
+const indicator = document.getElementById("pageIndicator");
 
-images.forEach((src, index) => {
-  const page = document.createElement("div");
-  page.className = "page";
-  page.style.zIndex = images.length - index;
-
-  const img = document.createElement("img");
-  img.src = src;
-  img.onclick = () => openZoom(src);
-
-  page.appendChild(img);
-  book.appendChild(page);
-  pages.push(page);
+// Cria páginas
+images.forEach((src, i) => {
+  const p = document.createElement("div");
+  p.className = "page";
+  p.style.zIndex = images.length - i;
+  p.innerHTML = `<img src="${src}" onclick="openZoom('${src}')">`;
+  book.appendChild(p);
 });
 
-function updatePages() {
-  pages.forEach((page, index) => {
-    if (index < currentPage) {
-      page.classList.add("flipped");
-    } else {
-      page.classList.remove("flipped");
-    }
+// Atualiza visual
+function update() {
+  const pages = [...document.querySelectorAll('.page')];
+  pages.forEach((pg, index) => {
+    pg.className = "page";
+    if (index < current) pg.classList.add("left");
+    else if (index === current) pg.classList.add("center");
+    else pg.classList.add("right");
   });
+
+  indicator.textContent = `Página ${current + 1} de ${images.length}`;
 }
 
-function nextPage() {
-  if (currentPage < pages.length - 1) {
-    currentPage++;
-    updatePages();
-  }
-}
+// Navegação
+function nextPage() { if (current < images.length - 1) current++; update(); }
+function prevPage() { if (current > 0) current--; update(); }
 
-function prevPage() {
-  if (currentPage > 0) {
-    currentPage--;
-    updatePages();
-  }
-}
-
+// Zoom
 function openZoom(src) {
   document.getElementById("zoomImage").src = src;
   document.getElementById("zoomModal").style.display = "flex";
 }
-
 function closeZoom() {
   document.getElementById("zoomModal").style.display = "none";
 }
 
+// Fullscreen
 function toggleFullscreen() {
-  if (!document.fullscreenElement) {
+  if (!document.fullscreenElement)
     document.documentElement.requestFullscreen();
-  } else {
+  else
     document.exitFullscreen();
-  }
 }
-</script>
 
+update();
+
+</script>
 </body>
 </html>
