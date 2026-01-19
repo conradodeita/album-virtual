@@ -1,45 +1,47 @@
 * {
   box-sizing: border-box;
+  user-select: none;
 }
 
 body {
   margin: 0;
-  background: #e5e5e5;
+  background: #e6e6e6;
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
-.viewer {
+.stage {
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-/* ÁLBUM */
-.album {
-  position: relative;
-  width: min(92vw, 900px);
+/* LIVRO */
+.book {
+  width: min(92vw, 960px);
   background: #fff;
-  box-shadow: 0 30px 70px rgba(0,0,0,0.3);
-  perspective: 2500px;
-  overflow: hidden;
-  transition: aspect-ratio 0.6s ease;
+  perspective: 2600px;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+  transition: aspect-ratio .6s ease;
 }
 
-.album.closed { aspect-ratio: 1 / 1; }
-.album.open   { aspect-ratio: 2 / 1; }
+.book.closed { aspect-ratio: 1 / 1; }
+.book.open   { aspect-ratio: 2 / 1; }
 
 /* CAPA */
 .cover {
   position: absolute;
   inset: 0;
   background: white;
+  transform-origin: left center;
+  transition: transform 1s cubic-bezier(.4,0,.2,1);
   display: flex;
   align-items: center;
   justify-content: center;
-  transform-origin: left center;
-  transition: transform 0.9s cubic-bezier(.4,0,.2,1);
+  z-index: 3;
 }
 
 .cover img {
@@ -48,8 +50,8 @@ body {
   object-fit: contain;
 }
 
-.album.open .cover {
-  transform: rotateY(-130deg);
+.book.open .cover {
+  transform: rotateY(-140deg);
   pointer-events: none;
 }
 
@@ -60,13 +62,13 @@ body {
   height: 100%;
 }
 
-.album.open .spread {
+.book.open .spread {
   display: flex;
 }
 
 /* LOMBADA */
 .spine {
-  width: 2%;
+  width: 3%;
   background: linear-gradient(
     to right,
     rgba(0,0,0,.35),
@@ -75,23 +77,16 @@ body {
   );
 }
 
-/* PÁGINAS */
-.page-wrapper {
-  width: 49%;
-  height: 100%;
-  perspective: 1800px;
-}
-
+/* PÁGINA */
 .page {
-  width: 100%;
-  height: 100%;
+  width: 48.5%;
   aspect-ratio: 1 / 1;
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform-origin: left center;
-  transition: transform .8s cubic-bezier(.25,.8,.25,1);
+  position: relative;
+  overflow: hidden;
 }
 
 .page img {
@@ -100,20 +95,15 @@ body {
   object-fit: contain;
 }
 
-/* CURVATURA + SOMBRA */
-.page.turn {
+/* VIRADA */
+.page.turning {
   transform:
     rotateY(var(--angle))
     skewY(var(--skew))
     scaleX(var(--scale));
   box-shadow:
-    var(--shadow-x) 0 40px rgba(0,0,0,var(--shadow-opacity));
-}
-
-/* MOBILE */
-@media (max-width: 700px) {
-  .album { width: 96vw; }
-  .nav { font-size: 32px; }
+    var(--shadow-x) 0 40px rgba(0,0,0,var(--shadow));
+  transition: transform .6s cubic-bezier(.25,.8,.25,1);
 }
 
 /* NAV */
@@ -125,11 +115,18 @@ body {
   color: #444;
 }
 
-#counter {
+/* CONTADOR */
+#pageCounter {
   position: fixed;
-  bottom: 15px;
+  bottom: 12px;
   width: 100%;
   text-align: center;
   font-size: 13px;
-  color: #666;
+  color: #555;
+}
+
+/* MOBILE */
+@media (max-width: 720px) {
+  .book { width: 96vw; }
+  .nav { font-size: 34px; }
 }
