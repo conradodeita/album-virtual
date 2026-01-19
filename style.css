@@ -82,13 +82,44 @@ body {
   object-fit: contain;
 }
 
-/* BOTÕES */
+/* CONTROLES */
 .nav {
-  background: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.9);
   border: none;
-  font-size: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: bold;
+  color: #333;
   cursor: pointer;
-  color: #444;
+  box-shadow: 0 10px 25px rgba(0,0,0,.25);
+  transition: transform .15s ease, box-shadow .15s ease;
+  z-index: 20;
+}
+
+.nav:hover {
+  transform: scale(1.12);
+  box-shadow: 0 14px 30px rgba(0,0,0,.35);
+}
+
+.nav:active {
+  transform: scale(.95);
+}
+
+.nav.prev { margin-right: 10px; }
+.nav.next { margin-left: 10px; }
+
+/* MOBILE */
+@media (max-width: 720px) {
+  .nav {
+    width: 54px;
+    height: 54px;
+    font-size: 34px;
+  }
 }
 
 /* CONTADOR */
