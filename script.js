@@ -14,10 +14,11 @@ const leftPage = document.querySelector('.page.left');
 const rightPage = document.querySelector('.page.right');
 
 /* ===============================
-   AUTO FOLHEAR (DESKTOP REALISTA)
+   AUTO FOLHEAR (DESKTOP LOOP)
 ================================ */
 let autoFlipTimer = null;
 let autoFlipActive = false;
+let autoDirection = 'forward';
 
 const isDesktop = () =>
   window.matchMedia('(pointer: fine)').matches &&
@@ -26,8 +27,7 @@ const isDesktop = () =>
 function startAutoFlip() {
   if (!isDesktop() || autoFlipActive) return;
   autoFlipActive = true;
-
-  autoFlipTimer = setTimeout(autoFlipStep, 3200);
+  autoFlipTimer = setTimeout(autoFlipStep, 3800);
 }
 
 function stopAutoFlip() {
@@ -38,16 +38,40 @@ function stopAutoFlip() {
 function autoFlipStep() {
   if (!autoFlipActive) return;
 
+  // FINAL → voltar para capa
   if (index >= spreads.length - 1) {
-    stopAutoFlip();
+    autoCloseAndRestart();
     return;
   }
 
   autoFlipAnimation(() => {
     index++;
     render();
-    autoFlipTimer = setTimeout(autoFlipStep, 3600);
+    autoFlipTimer = setTimeout(autoFlipStep, 3800);
   });
+}
+
+/* ===============================
+   FECHA E RECOMEÇA
+================================ */
+function autoCloseAndRestart() {
+  // pequena pausa na contracapa
+  setTimeout(() => {
+    book.classList.add('closed');
+
+    // delay visual de “fechar”
+    setTimeout(() => {
+      index = 0;
+      render();
+
+      // pausa na capa
+      setTimeout(() => {
+        book.classList.remove('closed');
+        autoFlipTimer = setTimeout(autoFlipStep, 3600);
+      }, 2200);
+
+    }, 1200);
+  }, 2200);
 }
 
 /* ===============================
@@ -56,25 +80,24 @@ function autoFlipStep() {
 function autoFlipAnimation(done) {
   const page = rightPage;
 
-  // Fase 1 – antecipação (folha começa a ceder)
-  page.style.transition = 'transform .6s cubic-bezier(.2,0,.3,1)';
-  page.style.transform = 'rotateY(-12deg)';
-  page.style.boxShadow = '-20px 0 40px rgba(0,0,0,.25)';
+  // antecipação
+  page.style.transition = 'transform .6s cubic-bezier(.25,0,.3,1)';
+  page.style.transform = 'rotateY(-14deg)';
+  page.style.boxShadow = '-22px 0 45px rgba(0,0,0,.25)';
 
   setTimeout(() => {
-    // Fase 2 – virada principal
-    page.style.transition = 'transform 1.1s cubic-bezier(.4,0,.2,1)';
-    page.style.transform = 'rotateY(-165deg)';
-    page.style.boxShadow = '-60px 0 80px rgba(0,0,0,.35)';
+    // virada principal
+    page.style.transition = 'transform 1.2s cubic-bezier(.4,0,.2,1)';
+    page.style.transform = 'rotateY(-168deg)';
+    page.style.boxShadow = '-70px 0 90px rgba(0,0,0,.38)';
 
     setTimeout(() => {
-      // Reset visual
       page.style.transition = '';
       page.style.transform = '';
       page.style.boxShadow = '';
 
       done && done();
-    }, 1150);
+    }, 1250);
   }, 650);
 }
 
@@ -87,7 +110,9 @@ fetch('album.json', { cache: 'no-store' })
     album = data;
     buildSpreads();
     render();
-    setTimeout(startAutoFlip, 4000);
+
+    // inicia automático
+    setTimeout(startAutoFlip, 4200);
   });
 
 function buildSpreads() {
@@ -97,8 +122,10 @@ function buildSpreads() {
 
   spreads = [];
 
+  // CAPA (lado direito apenas)
   spreads.push({ left: null, right: capa.image, type: 'capa' });
 
+  // MIOLO
   for (let i = 0; i < pages.length; i += 2) {
     spreads.push({
       left: pages[i]?.image || null,
@@ -107,9 +134,13 @@ function buildSpreads() {
     });
   }
 
+  // CONTRACAPA
   spreads.push({ left: null, right: contra.image, type: 'contracapa' });
 }
 
+/* ===============================
+   RENDER
+================================ */
 function render() {
   const s = spreads[index];
   if (!s) return;
@@ -132,7 +163,7 @@ function render() {
 }
 
 /* ===============================
-   BOTÕES (INTERROMPE AUTO)
+   BOTÕES (CANCELA AUTO)
 ================================ */
 btnNext.onclick = () => {
   stopAutoFlip();
