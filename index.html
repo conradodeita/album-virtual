@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -11,33 +10,24 @@
 
 <div class="stage">
 
-<button class="nav prev">‹</button>
+  <button class="nav prev">‹</button>
 
-  <div id="book" class="book">
+  <div class="book" id="book">
+    <div class="page left">
+      <img id="leftImg">
+    </div>
 
-```
-<div class="spread">
-
-  <div class="page left">
-    <img id="leftImg">
+    <div class="page right">
+      <img id="rightImg">
+    </div>
   </div>
 
-  <div class="page right">
-    <img id="rightImg">
-  </div>
-
-</div>
-```
-
-  </div>
-
-<button class="nav next">›</button>
+  <button class="nav next">›</button>
 
 </div>
 
 <div id="pageCounter"></div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
