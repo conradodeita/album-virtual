@@ -5,7 +5,7 @@
 
 body {
   margin: 0;
-  background: #e6e6e6;
+  background: #e5e5e5;
   font-family: Arial, sans-serif;
   overflow: hidden;
 }
@@ -22,41 +22,37 @@ body {
 /* LIVRO — SEMPRE 30x60 */
 .book {
   position: relative;
-  width: min(92vw, 1100px);
+  width: min(94vw, 1100px);
   aspect-ratio: 2 / 1;
-  background: #fff;
-  perspective: 3200px;
+  perspective: 4000px;
 }
 
 /* SOMBRA DE BASE */
 .book::after {
   content: '';
   position: absolute;
-  inset: -8% -4%;
+  inset: -10% -6%;
   background: radial-gradient(
     ellipse at center,
-    rgba(0,0,0,.35) 0%,
-    rgba(0,0,0,.15) 40%,
+    rgba(0,0,0,.35),
     transparent 70%
   );
-  filter: blur(30px);
+  filter: blur(35px);
   z-index: -1;
 }
 
-/* CAPA — METADE DO LIVRO */
+/* CAPA */
 .cover {
   position: absolute;
   left: 0;
   top: 0;
   width: 50%;
   height: 100%;
-  background: #fff;
+  background: white;
   transform-origin: left center;
   transition: transform 1s cubic-bezier(.4,0,.2,1);
   z-index: 5;
-  box-shadow:
-    12px 0 25px rgba(0,0,0,.25),
-    0 0 0 1px rgba(0,0,0,.04);
+  box-shadow: 12px 0 25px rgba(0,0,0,.25);
 }
 
 .cover img {
@@ -76,10 +72,11 @@ body {
   width: 100%;
   height: 100%;
   display: flex;
+  background: white;
   position: relative;
 }
 
-/* GRADIENTE CENTRAL (SEM LOMBADA) */
+/* SOMBRA CENTRAL (SEM LOMBADA) */
 .spread::before {
   content: '';
   position: absolute;
@@ -90,7 +87,7 @@ body {
   transform: translateX(-50%);
   background: radial-gradient(
     ellipse at center,
-    rgba(0,0,0,.18),
+    rgba(0,0,0,.2),
     transparent 70%
   );
   pointer-events: none;
@@ -101,41 +98,31 @@ body {
 .page {
   width: 50%;
   aspect-ratio: 1 / 1;
-  background: #fff;
-  position: relative;
-  overflow: hidden;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
   transform-style: preserve-3d;
+  overflow: hidden;
 }
 
-.page.left {
-  transform-origin: left center;
-  box-shadow: inset -1px 0 0 rgba(0,0,0,.04);
-}
+.page.left { transform-origin: left center; }
+.page.right { transform-origin: right center; }
 
-.page.right {
-  transform-origin: right center;
-  box-shadow: inset 1px 0 0 rgba(0,0,0,.04);
-}
-
-/* IMAGENS */
 .page img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #fff;
-  display: block;
+  background: white;
 }
 
-/* NAVEGAÇÃO */
+/* BOTÕES */
 .nav {
   background: none;
   border: none;
   font-size: 44px;
   cursor: pointer;
-  color: #555;
+  color: #444;
 }
 
 /* CONTADOR */
@@ -145,7 +132,7 @@ body {
   width: 100%;
   text-align: center;
   font-size: 13px;
-  color: #666;
+  color: #555;
 }
 
 /* MOBILE */
