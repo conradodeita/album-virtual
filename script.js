@@ -27,7 +27,7 @@ function setImg(el, src) {
   el.src = src ? encodeURI(src) : '';
 }
 
-/* PRELOAD */
+/* PRELOAD INTELIGENTE */
 function preload() {
   [-2, -1, 0, 1, 2].forEach(offset => {
     const p = album[index + offset];
@@ -43,6 +43,8 @@ function render() {
 
   leftPage.style.transform = '';
   rightPage.style.transform = '';
+  leftPage.style.boxShadow = '';
+  rightPage.style.boxShadow = '';
 
   if (page.type === 'capa' || page.type === 'contracapa') {
     book.className = 'book closed';
@@ -52,6 +54,7 @@ function render() {
   }
 
   book.className = 'book open';
+
   setImg(leftImg, page.image);
   setImg(rightImg, album[index + 1]?.image);
 
@@ -59,10 +62,11 @@ function render() {
   counter.innerText = `Páginas ${index + 1} – ${index + 2}`;
 }
 
-/* ===== ARRASTE FÍSICO ===== */
+/* ===== ARRASTE CONTÍNUO ===== */
 book.addEventListener('pointerdown', e => {
   startX = e.clientX;
   dragging = true;
+  currentX = startX;
 
   activePage = e.clientX > window.innerWidth / 2
     ? rightPage
@@ -70,21 +74,20 @@ book.addEventListener('pointerdown', e => {
 });
 
 book.addEventListener('pointermove', e => {
-  if (!dragging) return;
+  if (!dragging || !activePage) return;
 
   currentX = e.clientX;
   const delta = currentX - startX;
   const progress = Math.max(-1, Math.min(1, delta / 300));
 
   const angle = progress * 35;
-  const skew = progress * 4;
-  const scale = 1 - Math.abs(progress) * 0.06;
-  const shadow = Math.abs(progress) * 0.6;
+  const scale = 1 - Math.abs(progress) * 0.05;
+  const shadow = Math.abs(progress) * 0.5;
 
   activePage.style.transform =
-    `rotateY(${angle}deg) skewY(${skew}deg) scaleX(${scale})`;
+    `rotateY(${angle}deg) scaleX(${scale})`;
   activePage.style.boxShadow =
-    `${-angle * 2}px 0 40px rgba(0,0,0,${shadow})`;
+    `${-angle * 2}px 0 45px rgba(0,0,0,${shadow})`;
 });
 
 book.addEventListener('pointerup', () => {
