@@ -15,37 +15,56 @@ let currentX = 0;
 let dragging = false;
 let activePage = null;
 
+/* ===============================
+   LOAD
+================================ */
 fetch('album.json', { cache: 'no-store' })
   .then(r => r.json())
   .then(data => {
     album = data;
-    preload();
     render();
+    preload();
   });
 
 function setImg(el, src) {
   el.src = src ? encodeURI(src) : '';
 }
 
-/* PRELOAD INTELIGENTE */
+/* ===============================
+   PRELOAD INTELIGENTE
+================================ */
 function preload() {
-  [-2, -1, 0, 1, 2].forEach(offset => {
-    const p = album[index + offset];
-    if (p?.image) {
+  const candidates = [
+    index - 2,
+    index - 1,
+    index,
+    index + 1,
+    index + 2,
+    index + 3
+  ];
+
+  candidates.forEach(i => {
+    if (album[i]?.image) {
       const img = new Image();
-      img.src = encodeURI(p.image);
+      img.src = encodeURI(album[i].image);
     }
   });
 }
 
+/* ===============================
+   RENDER
+================================ */
 function render() {
   const page = album[index];
 
-  leftPage.style.transform = '';
-  rightPage.style.transform = '';
-  leftPage.style.boxShadow = '';
-  rightPage.style.boxShadow = '';
+  // reset visual
+  [leftPage, rightPage].forEach(p => {
+    p.style.transform = '';
+    p.style.boxShadow = '';
+    p.style.transition = '';
+  });
 
+  /* CAPA / CONTRACAPA */
   if (page.type === 'capa' || page.type === 'contracapa') {
     book.className = 'book closed';
     setImg(coverImg, page.image);
@@ -53,24 +72,53 @@ function render() {
     return;
   }
 
+  /* MIOLO */
   book.className = 'book open';
 
-  setImg(leftImg, page.image);
+  setImg(leftImg, album[index]?.image);
   setImg(rightImg, album[index + 1]?.image);
 
-  preload();
   counter.innerText = `Páginas ${index + 1} – ${index + 2}`;
+  preload();
 }
 
-/* ===== ARRASTE CONTÍNUO ===== */
+/* ===============================
+   PAGINAÇÃO SEGURA
+================================ */
+function nextIndex() {
+  // capa → primeira dupla
+  if (index === 0) return 1;
+
+  // miolo → avança 2
+  if (index + 2 < album.length - 1) return index + 2;
+
+  // última dupla → contracapa
+  return album.length - 1;
+}
+
+function prevIndex() {
+  // contracapa → última dupla
+  if (index === album.length - 1) return album.length - 3;
+
+  // miolo → volta 2
+  if (index - 2 >= 1) return index - 2;
+
+  // volta para capa
+  return 0;
+}
+
+/* ===============================
+   ARRASTE CONTÍNUO
+================================ */
 book.addEventListener('pointerdown', e => {
   startX = e.clientX;
-  dragging = true;
   currentX = startX;
+  dragging = true;
 
-  activePage = e.clientX > window.innerWidth / 2
-    ? rightPage
-    : leftPage;
+  activePage =
+    e.clientX > window.innerWidth / 2
+      ? rightPage
+      : leftPage;
 });
 
 book.addEventListener('pointermove', e => {
@@ -78,7 +126,7 @@ book.addEventListener('pointermove', e => {
 
   currentX = e.clientX;
   const delta = currentX - startX;
-  const progress = Math.max(-1, Math.min(1, delta / 300));
+  const progress = Math.max(-1, Math.min(1, delta / 280));
 
   const angle = progress * 35;
   const scale = 1 - Math.abs(progress) * 0.05;
@@ -86,6 +134,7 @@ book.addEventListener('pointermove', e => {
 
   activePage.style.transform =
     `rotateY(${angle}deg) scaleX(${scale})`;
+
   activePage.style.boxShadow =
     `${-angle * 2}px 0 45px rgba(0,0,0,${shadow})`;
 });
@@ -101,33 +150,39 @@ book.addEventListener('pointerup', () => {
   else resetPage();
 });
 
+/* ===============================
+   FINALIZAÇÃO
+================================ */
 function resetPage() {
   activePage.style.transition = 'transform .4s ease';
   activePage.style.transform = '';
   activePage.style.boxShadow = '';
-  setTimeout(() => activePage.style.transition = '', 400);
 }
 
-function finalize(dir) {
-  activePage.style.transition = 'transform .4s ease';
+function finalize(direction) {
+  activePage.style.transition = 'transform .35s ease';
+
   activePage.style.transform =
-    dir === 'next'
+    direction === 'next'
       ? 'rotateY(-160deg)'
       : 'rotateY(160deg)';
 
   setTimeout(() => {
-    index += dir === 'next'
-      ? (index === 0 ? 1 : 2)
-      : (index <= 1 ? -1 : -2);
+    index =
+      direction === 'next'
+        ? nextIndex()
+        : prevIndex();
 
-    index = Math.max(0, Math.min(index, album.length - 1));
     activePage.style.transition = '';
     activePage.style.transform = '';
     activePage.style.boxShadow = '';
+
     render();
-  }, 380);
+  }, 360);
 }
 
-/* BOTÕES */
+/* ===============================
+   BOTÕES
+================================ */
 document.querySelector('.next').onclick = () => finalize('next');
 document.querySelector('.prev').onclick = () => finalize('prev');
