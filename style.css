@@ -31,24 +31,6 @@ body {
 .book.closed { aspect-ratio: 1 / 1; }
 .book.open   { aspect-ratio: 2 / 1; }
 
-/* ESPESSURA */
-.thickness {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 12px;
-  background: linear-gradient(
-    to bottom,
-    #ddd,
-    #bbb,
-    #ddd
-  );
-  z-index: 0;
-}
-
-.thickness.left  { left: -12px; }
-.thickness.right { right: -12px; }
-
 /* CAPA */
 .cover {
   position: absolute;
@@ -75,27 +57,15 @@ body {
   display: none;
   width: 100%;
   height: 100%;
-  position: relative;
 }
 
 .book.open .spread {
   display: flex;
 }
 
-/* LOMBADA */
-.spine {
-  width: 3%;
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,.45),
-    rgba(0,0,0,.15),
-    rgba(0,0,0,.45)
-  );
-}
-
 /* PÁGINAS */
 .page {
-  width: 48.5%;
+  width: 50%;
   aspect-ratio: 1 / 1;
   background: white;
   position: relative;
