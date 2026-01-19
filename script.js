@@ -17,10 +17,8 @@ fetch('album.json', { cache: 'no-store' })
     render();
   });
 
-function bg(el, src) {
-  el.style.backgroundImage = src
-    ? `url("${encodeURI(src)}")`
-    : 'none';
+function setBg(el, img) {
+  el.style.backgroundImage = img ? `url("${encodeURI(img)}")` : 'none';
 }
 
 function render() {
@@ -28,7 +26,7 @@ function render() {
 
   if (page.type === 'capa' || page.type === 'contracapa') {
     albumEl.className = 'album closed';
-    bg(cover, page.image);
+    setBg(cover, page.image);
     counter.innerText = page.type.toUpperCase();
     return;
   }
@@ -36,14 +34,14 @@ function render() {
   albumEl.className = 'album open';
 
   if (page.type === 'spread') {
-    bg(left, page.image);
-    bg(right, page.image);
+    setBg(left, page.image);
+    setBg(right, page.image);
   } else {
-    bg(left, page.image);
-    bg(right, album[index + 1]?.image);
+    setBg(left, page.image);
+    setBg(right, album[index + 1]?.image);
   }
 
-  counter.innerText = `Páginas ${index + 1}–${index + 2}`;
+  counter.innerText = `Páginas ${index + 1} – ${index + 2}`;
 }
 
 function nextPage() {
