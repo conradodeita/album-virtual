@@ -59,22 +59,26 @@ function render() {
 }
 
 /* ===============================
-   VIRADA REAL (NEXT)
+   VIRADA CORRETA (NEXT)
 ================================ */
 function flipNext() {
   if (index >= spreads.length - 1) return;
 
+  // página fantasma nasce no lado direito
   flipImg.src = rightImg.src;
   flipPage.style.display = 'block';
+  flipPage.style.right = '0';
+  flipPage.style.left = 'auto';
+  flipPage.style.transformOrigin = 'right center';
   flipPage.style.transform = 'rotateY(0deg)';
 
   flipPage.animate(
     [
       { transform: 'rotateY(0deg)' },
-      { transform: 'rotateY(-180deg)' }
+      { transform: 'rotateY(180deg)' }
     ],
     {
-      duration: 1400,
+      duration: 1500,
       easing: 'cubic-bezier(.4,0,.2,1)',
       fill: 'forwards'
     }
@@ -84,15 +88,17 @@ function flipNext() {
     flipPage.style.display = 'none';
     index++;
     render();
-  }, 1400);
+  }, 1500);
 }
 
-/* BOTÕES */
-btnNext.onclick = flipNext;
-
+/* ===============================
+   VOLTAR (SEM ANIMAÇÃO AINDA)
+================================ */
 btnPrev.onclick = () => {
   if (index > 0) {
     index--;
     render();
   }
 };
+
+btnNext.onclick = flipNext;
