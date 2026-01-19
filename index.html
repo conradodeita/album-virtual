@@ -1,36 +1,32 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <title>Álbum Virtual</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CSS apenas para estrutura básica -->
-
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="viewer">
-    <button id="prev">‹</button>
+<div class="viewer">
 
-```
-<div class="book">
-  <div id="left" class="page left"></div>
-  <div id="right" class="page right"></div>
-</div>
+  <button id="prev" class="nav">‹</button>
 
-<button id="next">›</button>
-```
+  <div class="book">
+    <div id="single" class="page single"></div>
 
+    <div class="spread">
+      <div id="left" class="page left"></div>
+      <div id="right" class="page right"></div>
+    </div>
   </div>
 
-  <div id="counter"></div>
+  <button id="next" class="nav">›</button>
 
-  <!-- JS no final para garantir DOM carregado -->
+</div>
 
-  <script src="script.js"></script>
+<div id="counter"></div>
 
+<script src="script.js"></script>
 </body>
 </html>
