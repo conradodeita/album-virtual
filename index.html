@@ -8,11 +8,11 @@
 </head>
 <body>
 
-<div class="viewer">
+<div class="stage">
 
-  <button id="prev" class="nav">‹</button>
+  <button class="nav prev">‹</button>
 
-  <div id="album" class="album closed">
+  <div id="book" class="book closed">
 
     <!-- CAPA -->
     <div class="cover">
@@ -22,29 +22,25 @@
     <!-- MIOLO -->
     <div class="spread">
 
-      <div class="page-wrapper left-wrap">
-        <div class="page shadow">
-          <img id="leftImg">
-        </div>
+      <div class="page left">
+        <img id="leftImg">
       </div>
 
       <div class="spine"></div>
 
-      <div class="page-wrapper right-wrap">
-        <div class="page shadow">
-          <img id="rightImg">
-        </div>
+      <div class="page right">
+        <img id="rightImg">
       </div>
 
     </div>
 
   </div>
 
-  <button id="next" class="nav">›</button>
+  <button class="nav next">›</button>
 
 </div>
 
-<div id="counter"></div>
+<div id="pageCounter"></div>
 
 <script src="script.js"></script>
 </body>
