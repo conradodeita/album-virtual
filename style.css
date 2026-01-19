@@ -18,28 +18,29 @@ body {
   gap: 18px;
 }
 
+/* LIVRO */
 .book {
   position: relative;
   width: min(94vw, 1100px);
   aspect-ratio: 2 / 1;
-  perspective: 5000px;
 }
 
+/* SPREAD */
 .spread {
   width: 100%;
   height: 100%;
   display: flex;
   background: white;
   position: relative;
+  overflow: hidden;
 }
 
+/* PÁGINAS */
 .page {
   width: 50%;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
   overflow: hidden;
 }
 
@@ -49,7 +50,7 @@ body {
   object-fit: contain;
 }
 
-/* ESTADO FECHADO (CAPA) */
+/* CAPA FECHADA */
 .book.closed .page.left {
   display: none;
 }
@@ -58,24 +59,21 @@ body {
   width: 100%;
 }
 
-/* FLIP PAGE (FANTASMA) */
-.flip-page {
+/* PAGE CURL FAKE */
+.page.right .curl {
   position: absolute;
   top: 0;
   right: 0;
-  width: 50%;
+  width: 0%;
   height: 100%;
-  background: white;
-  transform-origin: right center;
-  transform-style: preserve-3d;
-  display: none;
-  z-index: 10;
-}
-
-.flip-page img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  pointer-events: none;
+  background: linear-gradient(
+    to left,
+    rgba(0,0,0,.35),
+    rgba(0,0,0,.15),
+    transparent
+  );
+  transition: width 0s;
 }
 
 /* CONTROLES */
