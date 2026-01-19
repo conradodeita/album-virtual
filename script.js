@@ -21,8 +21,11 @@ function bg(el, img) {
   el.style.backgroundImage = img ? `url("${encodeURI(img)}")` : 'none';
 }
 
-function render() {
+function render(turn = false) {
   const page = album[index];
+
+  left.classList.remove('turn-left');
+  right.classList.remove('turn-right');
 
   if (page.type === 'capa' || page.type === 'contracapa') {
     albumEl.className = 'album closed';
@@ -42,19 +45,24 @@ function render() {
   }
 
   counter.innerText = `Páginas ${index + 1} – ${index + 2}`;
+
+  if (turn) {
+    left.classList.add('turn-left');
+    right.classList.add('turn-right');
+  }
 }
 
 function nextPage() {
   if (index < album.length - 1) {
     index += index === 0 ? 1 : 2;
-    render();
+    render(true);
   }
 }
 
 function prevPage() {
   if (index > 0) {
     index -= index <= 1 ? 1 : 2;
-    render();
+    render(true);
   }
 }
 
