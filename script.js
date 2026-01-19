@@ -5,12 +5,13 @@ let index = 0;
 const book = document.getElementById('book');
 const leftImg = document.getElementById('leftImg');
 const rightImg = document.getElementById('rightImg');
-const flipPage = document.getElementById('flipPage');
-const flipImg = document.getElementById('flipImg');
 const counter = document.getElementById('pageCounter');
 
 const btnNext = document.querySelector('.nav.next');
 const btnPrev = document.querySelector('.nav.prev');
+
+const rightPage = document.querySelector('.page.right');
+const curl = document.querySelector('.curl');
 
 /* LOAD */
 fetch('album.json', { cache: 'no-store' })
@@ -59,46 +60,46 @@ function render() {
 }
 
 /* ===============================
-   VIRADA CORRETA (NEXT)
+   PAGE CURL NEXT
 ================================ */
 function flipNext() {
   if (index >= spreads.length - 1) return;
 
-  // página fantasma nasce no lado direito
-  flipImg.src = rightImg.src;
-  flipPage.style.display = 'block';
-  flipPage.style.right = '0';
-  flipPage.style.left = 'auto';
-  flipPage.style.transformOrigin = 'right center';
-  flipPage.style.transform = 'rotateY(0deg)';
+  curl.style.transition = 'width 0.9s ease';
+  curl.style.width = '55%';
 
-  flipPage.animate(
-    [
-      { transform: 'rotateY(0deg)' },
-      { transform: 'rotateY(180deg)' }
-    ],
-    {
-      duration: 1500,
-      easing: 'cubic-bezier(.4,0,.2,1)',
-      fill: 'forwards'
-    }
-  );
+  rightPage.style.transition = 'transform 0.9s ease';
+  rightPage.style.transform = 'translateX(-50%)';
 
   setTimeout(() => {
-    flipPage.style.display = 'none';
+    curl.style.transition = '';
+    curl.style.width = '0%';
+
+    rightPage.style.transition = '';
+    rightPage.style.transform = '';
+
     index++;
     render();
-  }, 1500);
+  }, 900);
 }
 
 /* ===============================
-   VOLTAR (SEM ANIMAÇÃO AINDA)
+   PAGE CURL PREV
 ================================ */
-btnPrev.onclick = () => {
-  if (index > 0) {
-    index--;
-    render();
-  }
-};
+function flipPrev() {
+  if (index <= 0) return;
+
+  index--;
+  render();
+
+  curl.style.width = '55%';
+  rightPage.style.transform = 'translateX(50%)';
+
+  setTimeout(() => {
+    curl.style.width = '0%';
+    rightPage.style.transform = '';
+  }, 600);
+}
 
 btnNext.onclick = flipNext;
+btnPrev.onclick = flipPrev;
