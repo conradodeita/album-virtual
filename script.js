@@ -2,10 +2,10 @@ let album = [];
 let index = 0;
 
 const albumEl = document.getElementById('album');
-const cover   = document.getElementById('cover');
-const left    = document.getElementById('left');
-const right   = document.getElementById('right');
-const counter = document.getElementById('counter');
+const coverImg = document.getElementById('coverImg');
+const leftImg  = document.getElementById('leftImg');
+const rightImg = document.getElementById('rightImg');
+const counter  = document.getElementById('counter');
 
 const nextBtn = document.getElementById('next');
 const prevBtn = document.getElementById('prev');
@@ -17,19 +17,23 @@ fetch('album.json', { cache: 'no-store' })
     render();
   });
 
-function bg(el, img) {
-  el.style.backgroundImage = img ? `url("${encodeURI(img)}")` : 'none';
+function setImg(imgEl, src) {
+  imgEl.src = src ? encodeURI(src) : '';
+}
+
+function clearTurns() {
+  leftImg.parentElement.classList.remove('turn-left');
+  rightImg.parentElement.classList.remove('turn-right');
 }
 
 function render(turn = false) {
   const page = album[index];
 
-  left.classList.remove('turn-left');
-  right.classList.remove('turn-right');
+  clearTurns();
 
   if (page.type === 'capa' || page.type === 'contracapa') {
     albumEl.className = 'album closed';
-    bg(cover, page.image);
+    setImg(coverImg, page.image);
     counter.innerText = page.type.toUpperCase();
     return;
   }
@@ -37,18 +41,18 @@ function render(turn = false) {
   albumEl.className = 'album open';
 
   if (page.type === 'spread') {
-    bg(left, page.image);
-    bg(right, page.image);
+    setImg(leftImg, page.image);
+    setImg(rightImg, page.image);
   } else {
-    bg(left, page.image);
-    bg(right, album[index + 1]?.image);
+    setImg(leftImg, page.image);
+    setImg(rightImg, album[index + 1]?.image);
   }
 
   counter.innerText = `Páginas ${index + 1} – ${index + 2}`;
 
   if (turn) {
-    left.classList.add('turn-left');
-    right.classList.add('turn-right');
+    leftImg.parentElement.classList.add('turn-left');
+    rightImg.parentElement.classList.add('turn-right');
   }
 }
 
@@ -68,5 +72,5 @@ function prevPage() {
 
 nextBtn.onclick = nextPage;
 prevBtn.onclick = prevPage;
-right.onclick = nextPage;
-left.onclick = prevPage;
+rightImg.onclick = nextPage;
+leftImg.onclick = prevPage;
