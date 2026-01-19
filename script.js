@@ -7,105 +7,108 @@ const leftImg = document.getElementById('leftImg');
 const rightImg = document.getElementById('rightImg');
 const counter = document.getElementById('pageCounter');
 
+const leftPage = document.querySelector('.page.left');
+const rightPage = document.querySelector('.page.right');
+
 const btnNext = document.querySelector('.nav.next');
 const btnPrev = document.querySelector('.nav.prev');
 
-const rightPage = document.querySelector('.page.right');
-const shadow = document.querySelector('.shadow');
-
 /* LOAD */
 fetch('album.json', { cache: 'no-store' })
-  .then(r => r.json())
-  .then(data => {
-    album = data;
-    buildSpreads();
-    render();
-  });
+.then(r => r.json())
+.then(data => {
+album = data;
+buildSpreads();
+render();
+autoFlip();
+});
 
+/* BUILD */
 function buildSpreads() {
-  const capa = album.find(p => p.type === 'capa');
-  const contra = album.find(p => p.type === 'contracapa');
-  const pages = album.filter(p => p !== capa && p !== contra);
+const capa = album.find(p => p.type === 'capa');
+const contra = album.find(p => p.type === 'contracapa');
+const pages = album.filter(p => p.type === 'pagina');
 
-  spreads = [];
-  spreads.push({ left: null, right: capa.image, type: 'capa' });
+spreads = [];
 
-  for (let i = 0; i < pages.length; i += 2) {
-    spreads.push({
-      left: pages[i]?.image || null,
-      right: pages[i + 1]?.image || null,
-      type: 'spread'
-    });
-  }
+// Capa no lado direito, esquerdo vazio
+spreads.push({ left: null, right: capa.image, type: 'capa' });
 
-  spreads.push({ left: null, right: contra.image, type: 'contracapa' });
+for (let i = 0; i < pages.length; i += 2) {
+spreads.push({
+left: pages[i]?.image || null,
+right: pages[i + 1]?.image || null,
+type: 'spread'
+});
 }
 
+spreads.push({ left: null, right: contra.image, type: 'contracapa' });
+}
+
+/* RENDER */
 function render() {
-  const s = spreads[index];
-  if (!s) return;
+const s = spreads[index];
+if (!s) return;
 
-  book.classList.toggle('closed', index === 0);
+leftImg.src = s.left || '';
+rightImg.src = s.right || '';
 
-  leftImg.src = s.left || '';
-  rightImg.src = s.right || '';
+leftImg.style.visibility = s.left ? 'visible' : 'hidden';
 
-  counter.innerText =
-    s.type === 'capa'
-      ? 'CAPA'
-      : s.type === 'contracapa'
-        ? 'CONTRACAPA'
-        : `PÁGINAS ${index}`;
+counter.innerText =
+s.type === 'capa'
+? 'CAPA'
+: s.type === 'contracapa'
+? 'CONTRACAPA'
+: `PÁGINAS ${index} / ${spreads.length - 2}`;
 }
 
-/* ===============================
-   FLIP NEXT — SENTIDO CORRETO
-================================ */
+/* FLIP NEXT (CORRETO) */
 function flipNext() {
-  if (index >= spreads.length - 1) return;
+if (index >= spreads.length - 1) return;
 
-  rightPage.style.transition =
-    'transform 1.25s cubic-bezier(.4,0,.2,1)';
-  shadow.style.transition = 'opacity 1.25s ease';
+rightPage.style.transition =
+'transform 1.6s cubic-bezier(.22,.61,.36,1), box-shadow 1.6s ease';
 
-  shadow.style.opacity = 1;
+rightPage.style.boxShadow =
+'-60px 0 80px rgba(0,0,0,.45)';
 
-  /* 🔥 AQUI ESTÁ A CORREÇÃO */
-  rightPage.style.transform =
-    'rotateZ(8deg) rotateY(140deg)';
+rightPage.style.transform = `     rotateZ(-14deg)
+    translateX(-45%)
+    rotateY(-155deg)
+  `;
 
-  setTimeout(() => {
-    rightPage.style.transition = '';
-    rightPage.style.transform = '';
-    shadow.style.opacity = 0;
-
-    index++;
-    render();
-  }, 1250);
+setTimeout(() => {
+rightPage.style.transition = '';
+rightPage.style.transform = '';
+rightPage.style.boxShadow = '';
+index++;
+render();
+}, 1600);
 }
 
-/* ===============================
-   FLIP PREV — VOLTA NATURAL
-================================ */
+/* FLIP PREV */
 function flipPrev() {
-  if (index <= 0) return;
+if (index <= 0) return;
 
-  index--;
-  render();
-
-  rightPage.style.transition =
-    'transform .9s cubic-bezier(.4,0,.2,1)';
-  shadow.style.transition = 'opacity .9s ease';
-
-  shadow.style.opacity = 1;
-  rightPage.style.transform =
-    'rotateZ(-8deg) rotateY(-140deg)';
-
-  setTimeout(() => {
-    rightPage.style.transform = '';
-    shadow.style.opacity = 0;
-  }, 900);
+index--;
+render();
 }
 
+/* BOTÕES */
 btnNext.onclick = flipNext;
 btnPrev.onclick = flipPrev;
+
+/* AUTO LOOP (DESKTOP) */
+function autoFlip() {
+if (window.innerWidth < 900) return;
+
+setInterval(() => {
+if (index >= spreads.length - 1) {
+index = 0;
+render();
+} else {
+flipNext();
+}
+}, 4200);
+}
