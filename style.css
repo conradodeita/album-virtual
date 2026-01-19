@@ -20,9 +20,9 @@ body {
 
 /* LIVRO */
 .book {
-  position: relative;
   width: min(94vw, 1100px);
   aspect-ratio: 2 / 1;
+  perspective: 2400px;
 }
 
 /* SPREAD */
@@ -31,17 +31,17 @@ body {
   height: 100%;
   display: flex;
   background: white;
-  position: relative;
   overflow: hidden;
+  position: relative;
 }
 
 /* PÁGINAS */
 .page {
   width: 50%;
   height: 100%;
-  background: white;
   position: relative;
   overflow: hidden;
+  background: white;
 }
 
 .page img {
@@ -54,26 +54,28 @@ body {
 .book.closed .page.left {
   display: none;
 }
-
 .book.closed .page.right {
   width: 100%;
 }
 
-/* PAGE CURL FAKE */
-.page.right .curl {
+/* DIREITA — CANTO SUPERIOR */
+.page.right {
+  transform-origin: top right;
+  z-index: 5;
+}
+
+/* SOMBRA DA DOBRA */
+.page.right .shadow {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 0%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
   background: linear-gradient(
-    to left,
-    rgba(0,0,0,.35),
-    rgba(0,0,0,.15),
-    transparent
+    -135deg,
+    rgba(0,0,0,.45),
+    rgba(0,0,0,.2),
+    transparent 55%
   );
-  transition: width 0s;
+  opacity: 0;
 }
 
 /* CONTROLES */
@@ -81,8 +83,8 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: white;
   border: none;
+  background: white;
   font-size: 42px;
   cursor: pointer;
   box-shadow: 0 10px 25px rgba(0,0,0,.25);
