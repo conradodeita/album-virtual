@@ -63,6 +63,13 @@ function render() {
   const s = spreads[index];
   if (!s) return;
 
+  // Estado visual do livro
+  if (index === 0) {
+    book.classList.add('closed');
+  } else {
+    book.classList.remove('closed');
+  }
+
   leftImg.src = s.left || '';
   rightImg.src = s.right || '';
 
@@ -73,6 +80,7 @@ function render() {
         ? 'CONTRACAPA'
         : `PÁGINAS ${index} / ${spreads.length - 2}`;
 }
+
 
 /* ===============================
    FUNÇÃO DE VIRADA FÍSICA
