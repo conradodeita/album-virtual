@@ -17,6 +17,7 @@ let dragging = false;
 let startX = 0;
 let activePage = null;
 let direction = null;
+let animating = false;
 
 /* LOAD */
 fetch('album.json', { cache: 'no-store' })
@@ -30,12 +31,18 @@ fetch('album.json', { cache: 'no-store' })
 function buildSpreads() {
   const capa = album.find(p => p.type === 'capa');
   const contra = album.find(p => p.type === 'contracapa');
-  const pages = album.filter(p => p !== capa && p !== contra);
+  const pages = album.filter(p => p.type === 'pagina');
 
   spreads = [];
 
-  spreads.push({ left: null, right: capa.image, type: 'capa' });
+  // Spread 0: esquerda vazia, direita capa
+  spreads.push({
+    left: null,
+    right: capa.image,
+    type: 'capa'
+  });
 
+  // Miolo
   for (let i = 0; i < pages.length; i += 2) {
     spreads.push({
       left: pages[i]?.image || null,
@@ -44,7 +51,12 @@ function buildSpreads() {
     });
   }
 
-  spreads.push({ left: null, right: contra.image, type: 'contracapa' });
+  // Último: contracapa à direita
+  spreads.push({
+    left: null,
+    right: contra.image,
+    type: 'contracapa'
+  });
 }
 
 function render() {
@@ -63,21 +75,49 @@ function render() {
 }
 
 /* ===============================
-   BOTÕES (PRIORIDADE)
+   FUNÇÃO DE VIRADA FÍSICA
+================================ */
+function flipPage(dir) {
+  if (animating) return;
+  animating = true;
+
+  const page =
+    dir === 'next' ? rightPage : leftPage;
+
+  page.style.transition = 'transform .6s cubic-bezier(.4,0,.2,1)';
+  page.style.transform =
+    dir === 'next'
+      ? 'rotateY(-180deg)'
+      : 'rotateY(180deg)';
+
+  setTimeout(() => {
+    page.style.transition = '';
+    page.style.transform = '';
+
+    index =
+      dir === 'next'
+        ? Math.min(index + 1, spreads.length - 1)
+        : Math.max(index - 1, 0);
+
+    render();
+    animating = false;
+  }, 620);
+}
+
+/* ===============================
+   BOTÕES
 ================================ */
 btnNext.addEventListener('click', e => {
   e.stopPropagation();
   if (index < spreads.length - 1) {
-    index++;
-    render();
+    flipPage('next');
   }
 });
 
 btnPrev.addEventListener('click', e => {
   e.stopPropagation();
   if (index > 0) {
-    index--;
-    render();
+    flipPage('prev');
   }
 });
 
@@ -85,6 +125,8 @@ btnPrev.addEventListener('click', e => {
    ARRASTE (SWIPE)
 ================================ */
 book.addEventListener('pointerdown', e => {
+  if (animating) return;
+
   dragging = true;
   startX = e.clientX;
 
@@ -101,14 +143,14 @@ book.addEventListener('pointerdown', e => {
 });
 
 book.addEventListener('pointermove', e => {
-  if (!dragging || !activePage) return;
+  if (!dragging || !activePage || animating) return;
 
   const delta = e.clientX - startX;
   const width = book.offsetWidth / 2;
   const progress = Math.max(-1, Math.min(1, delta / width));
 
-  const angle = progress * 180;
-  const shadow = Math.abs(progress) * 0.6;
+  const angle = progress * 160;
+  const shadow = Math.abs(progress) * 0.5;
 
   activePage.style.transform = `rotateY(${angle}deg)`;
   activePage.style.boxShadow =
@@ -116,22 +158,18 @@ book.addEventListener('pointermove', e => {
 });
 
 book.addEventListener('pointerup', e => {
-  if (!dragging) return;
+  if (!dragging || animating) return;
   dragging = false;
 
   const delta = e.clientX - startX;
 
   if (Math.abs(delta) > 120) {
-    direction === 'next'
-      ? index = Math.min(index + 1, spreads.length - 1)
-      : index = Math.max(index - 1, 0);
-  }
-
-  if (activePage) {
+    flipPage(direction);
+  } else {
+    activePage.style.transition = 'transform .3s ease';
     activePage.style.transform = '';
     activePage.style.boxShadow = '';
   }
 
   activePage = null;
-  render();
 });
