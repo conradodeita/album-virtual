@@ -10,7 +10,6 @@ body {
   overflow: hidden;
 }
 
-/* PALCO */
 .stage {
   height: 100vh;
   display: flex;
@@ -19,15 +18,13 @@ body {
   gap: 18px;
 }
 
-/* LIVRO — SEMPRE 30x60 */
 .book {
   position: relative;
   width: min(94vw, 1100px);
   aspect-ratio: 2 / 1;
-  perspective: 4000px;
+  perspective: 4200px;
 }
 
-/* SOMBRA DE BASE */
 .book::after {
   content: '';
   position: absolute;
@@ -41,33 +38,6 @@ body {
   z-index: -1;
 }
 
-/* CAPA */
-.cover {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 50%;
-  height: 100%;
-  background: white;
-  transform-origin: left center;
-  transition: transform 1s cubic-bezier(.4,0,.2,1);
-  z-index: 5;
-  box-shadow: 12px 0 25px rgba(0,0,0,.25);
-}
-
-.cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* CAPA ABERTA */
-.book.open .cover {
-  transform: rotateY(-180deg);
-  pointer-events: none;
-}
-
-/* SPREAD */
 .spread {
   width: 100%;
   height: 100%;
@@ -76,7 +46,6 @@ body {
   position: relative;
 }
 
-/* SOMBRA CENTRAL (SEM LOMBADA) */
 .spread::before {
   content: '';
   position: absolute;
@@ -87,14 +56,12 @@ body {
   transform: translateX(-50%);
   background: radial-gradient(
     ellipse at center,
-    rgba(0,0,0,.2),
+    rgba(0,0,0,.18),
     transparent 70%
   );
-  pointer-events: none;
-  z-index: 3;
+  z-index: 2;
 }
 
-/* PÁGINAS */
 .page {
   width: 50%;
   aspect-ratio: 1 / 1;
@@ -102,8 +69,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transform-style: preserve-3d;
   overflow: hidden;
+  transform-style: preserve-3d;
 }
 
 .page.left { transform-origin: left center; }
@@ -113,7 +80,6 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: white;
 }
 
 /* BOTÕES */
