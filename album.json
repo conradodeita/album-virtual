@@ -24,7 +24,12 @@
     "image": "pagina05.jpg"
   },
   {
+    "type": "pagina",
+    "image": "pagina06.jpg"
+  },
+  {
     "type": "contracapa",
     "image": "ContraCapa.jpg"
   }
 ]
+
