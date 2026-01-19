@@ -3,7 +3,6 @@
     "type": "capa",
     "image": "Capa.jpg"
   },
-
   {
     "type": "pagina",
     "image": "pagina01.jpg"
@@ -24,7 +23,6 @@
     "type": "pagina",
     "image": "pagina05.jpg"
   },
-
   {
     "type": "contracapa",
     "image": "ContraCapa.jpg"
