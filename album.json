@@ -1,38 +1,99 @@
 [
-{ "type": "capa", "image": "ANA CLARA DA SILVA MENDES 02.jpg" },
+  {
+    "type": "capa",
+    "image": "ELIAS DE CARVALHO FRAMIL COSTA - Capa 02_a.jpg"
+  },
 
-{ "image": "CAS00742.jpg" },
-{ "image": "CAS01018.jpg" },
+  {
+    "image": "ANA CLARA DA SILVA MENDES 02.jpg"
+  },
+  {
+    "image": "CAS00742.jpg"
+  },
 
-{ "type": "spread", "image": "CAS02101.jpg" },
+  {
+    "type": "spread",
+    "image": "CAS01018.jpg"
+  },
 
-{ "image": "CAS07547-2.jpg" },
-{ "image": "CAS07916-2.jpg" },
+  {
+    "image": "CAS02101.jpg"
+  },
+  {
+    "image": "CAS07547-2.jpg"
+  },
 
-{ "image": "CAS08177.jpg" },
-{ "image": "CAS08238 (1).jpg" },
+  {
+    "type": "spread",
+    "image": "CAS07916-2.jpg"
+  },
 
-{ "type": "spread", "image": "CAS08646.jpg" },
+  {
+    "image": "CAS08177.jpg"
+  },
+  {
+    "image": "CAS08238 (1).jpg"
+  },
 
-{ "image": "CAS08730.jpg" },
-{ "image": "CAS09026.jpg" },
+  {
+    "type": "spread",
+    "image": "CAS08646.jpg"
+  },
 
-{ "image": "CAS09447.jpg" },
-{ "image": "DSC05580-2.jpg" },
+  {
+    "image": "CAS08730.jpg"
+  },
+  {
+    "image": "CAS09026.jpg"
+  },
 
-{ "image": "DSC05592 (1).jpg" },
-{ "image": "DSC09471.jpg" },
+  {
+    "type": "spread",
+    "image": "CAS09447.jpg"
+  },
 
-{ "type": "spread", "image": "DSC09611.jpg" },
+  {
+    "image": "DSC05580-2.jpg"
+  },
+  {
+    "image": "DSC05592 (1).jpg"
+  },
 
-{ "image": "DSC09707-Editar.jpg" },
-{ "image": "DSC09908-2.jpg" },
+  {
+    "type": "spread",
+    "image": "DSC09471.jpg"
+  },
 
-{ "image": "DiaDosPais-05418.jpg" },
-{ "image": "DiaDosPais-05817.jpg" },
+  {
+    "image": "DSC09611.jpg"
+  },
+  {
+    "image": "DSC09707-Editar.jpg"
+  },
 
-{ "type": "spread", "image": "DiaDosPais-05831.jpg" },
+  {
+    "type": "spread",
+    "image": "DSC09908-2.jpg"
+  },
 
-{ "image": "DiaDosPais-05840-2.jpg" },
-{ "type": "contracapa", "image": "PEDRO PERRONI DA FONSECA 03_a.jpg" }
+  {
+    "image": "DiaDosPais-05418.jpg"
+  },
+  {
+    "image": "DiaDosPais-05817.jpg"
+  },
+
+  {
+    "type": "spread",
+    "image": "DiaDosPais-05831.jpg"
+  },
+
+  {
+    "image": "DiaDosPais-05840-2.jpg"
+  },
+
+  {
+    "type": "contracapa",
+    "image": "ELIAS DE CARVALHO FRAMIL COSTA - Estojo 01.jpg"
+  }
 ]
