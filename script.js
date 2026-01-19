@@ -11,7 +11,7 @@ const btnNext = document.querySelector('.nav.next');
 const btnPrev = document.querySelector('.nav.prev');
 
 const rightPage = document.querySelector('.page.right');
-const curl = document.querySelector('.curl');
+const shadow = document.querySelector('.shadow');
 
 /* LOAD */
 fetch('album.json', { cache: 'no-store' })
@@ -45,8 +45,7 @@ function render() {
   const s = spreads[index];
   if (!s) return;
 
-  if (index === 0) book.classList.add('closed');
-  else book.classList.remove('closed');
+  book.classList.toggle('closed', index === 0);
 
   leftImg.src = s.left || '';
   rightImg.src = s.right || '';
@@ -60,31 +59,31 @@ function render() {
 }
 
 /* ===============================
-   PAGE CURL NEXT
+   FLIP NEXT — DIAGONAL
 ================================ */
 function flipNext() {
   if (index >= spreads.length - 1) return;
 
-  curl.style.transition = 'width 0.9s ease';
-  curl.style.width = '55%';
+  rightPage.style.transition =
+    'transform 1.2s cubic-bezier(.4,.0,.2,1)';
+  shadow.style.transition = 'opacity 1.2s ease';
 
-  rightPage.style.transition = 'transform 0.9s ease';
-  rightPage.style.transform = 'translateX(-50%)';
+  shadow.style.opacity = 1;
+  rightPage.style.transform =
+    'rotateZ(-8deg) rotateY(-140deg)';
 
   setTimeout(() => {
-    curl.style.transition = '';
-    curl.style.width = '0%';
-
     rightPage.style.transition = '';
     rightPage.style.transform = '';
+    shadow.style.opacity = 0;
 
     index++;
     render();
-  }, 900);
+  }, 1200);
 }
 
 /* ===============================
-   PAGE CURL PREV
+   FLIP PREV — SIMÉTRICO
 ================================ */
 function flipPrev() {
   if (index <= 0) return;
@@ -92,13 +91,14 @@ function flipPrev() {
   index--;
   render();
 
-  curl.style.width = '55%';
-  rightPage.style.transform = 'translateX(50%)';
+  rightPage.style.transform =
+    'rotateZ(8deg) rotateY(140deg)';
+  shadow.style.opacity = 1;
 
   setTimeout(() => {
-    curl.style.width = '0%';
     rightPage.style.transform = '';
-  }, 600);
+    shadow.style.opacity = 0;
+  }, 800);
 }
 
 btnNext.onclick = flipNext;
