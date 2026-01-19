@@ -19,11 +19,21 @@ body {
 /* ===== ÁLBUM ===== */
 .album {
   position: relative;
-  width: min(90vw, 900px);
-  aspect-ratio: 1 / 1;
+  width: min(92vw, 900px);
   background: #fff;
   box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  transition: aspect-ratio 0.4s ease;
   overflow: hidden;
+}
+
+/* FECHADO → 30x30 */
+.album.closed {
+  aspect-ratio: 1 / 1;
+}
+
+/* ABERTO → 60x30 */
+.album.open {
+  aspect-ratio: 2 / 1;
 }
 
 /* ===== CAPA / CONTRACAPA ===== */
@@ -41,12 +51,12 @@ body {
   display: none;
   width: 100%;
   height: 100%;
-  display: flex;
 }
 
 /* ===== PÁGINAS ===== */
 .page {
   width: 50%;
+  height: 100%;
   aspect-ratio: 1 / 1;
   background-color: white;
   background-size: contain;
@@ -92,7 +102,7 @@ body {
 /* ===== MOBILE ===== */
 @media (max-width: 600px) {
   .album {
-    width: 95vw;
+    width: 96vw;
   }
 
   .nav {
