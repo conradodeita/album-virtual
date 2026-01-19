@@ -18,7 +18,6 @@ const rightPage = document.querySelector('.page.right');
 ================================ */
 let autoFlipTimer = null;
 let autoFlipActive = false;
-let autoDirection = 'forward';
 
 const isDesktop = () =>
   window.matchMedia('(pointer: fine)').matches &&
@@ -38,7 +37,6 @@ function stopAutoFlip() {
 function autoFlipStep() {
   if (!autoFlipActive) return;
 
-  // FINAL → voltar para capa
   if (index >= spreads.length - 1) {
     autoCloseAndRestart();
     return;
@@ -55,16 +53,13 @@ function autoFlipStep() {
    FECHA E RECOMEÇA
 ================================ */
 function autoCloseAndRestart() {
-  // pequena pausa na contracapa
   setTimeout(() => {
     book.classList.add('closed');
 
-    // delay visual de “fechar”
     setTimeout(() => {
       index = 0;
       render();
 
-      // pausa na capa
       setTimeout(() => {
         book.classList.remove('closed');
         autoFlipTimer = setTimeout(autoFlipStep, 3600);
@@ -75,21 +70,24 @@ function autoCloseAndRestart() {
 }
 
 /* ===============================
-   ANIMAÇÃO DE FOLHEAR
+   ANIMAÇÃO CORRETA DE FOLHEAR
 ================================ */
 function autoFlipAnimation(done) {
   const page = rightPage;
 
-  // antecipação
+  // garantir origem correta
+  page.style.transformOrigin = 'right center';
+
+  /* Fase 1 — antecipação */
   page.style.transition = 'transform .6s cubic-bezier(.25,0,.3,1)';
-  page.style.transform = 'rotateY(-14deg)';
-  page.style.boxShadow = '-22px 0 45px rgba(0,0,0,.25)';
+  page.style.transform = 'rotateY(12deg)';
+  page.style.boxShadow = '20px 0 45px rgba(0,0,0,.25)';
 
   setTimeout(() => {
-    // virada principal
+    /* Fase 2 — virada real */
     page.style.transition = 'transform 1.2s cubic-bezier(.4,0,.2,1)';
-    page.style.transform = 'rotateY(-168deg)';
-    page.style.boxShadow = '-70px 0 90px rgba(0,0,0,.38)';
+    page.style.transform = 'rotateY(170deg)';
+    page.style.boxShadow = '70px 0 90px rgba(0,0,0,.38)';
 
     setTimeout(() => {
       page.style.transition = '';
@@ -110,8 +108,6 @@ fetch('album.json', { cache: 'no-store' })
     album = data;
     buildSpreads();
     render();
-
-    // inicia automático
     setTimeout(startAutoFlip, 4200);
   });
 
@@ -122,10 +118,8 @@ function buildSpreads() {
 
   spreads = [];
 
-  // CAPA (lado direito apenas)
   spreads.push({ left: null, right: capa.image, type: 'capa' });
 
-  // MIOLO
   for (let i = 0; i < pages.length; i += 2) {
     spreads.push({
       left: pages[i]?.image || null,
@@ -134,7 +128,6 @@ function buildSpreads() {
     });
   }
 
-  // CONTRACAPA
   spreads.push({ left: null, right: contra.image, type: 'contracapa' });
 }
 
