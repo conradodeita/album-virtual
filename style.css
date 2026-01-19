@@ -4,7 +4,7 @@
 
 body {
   margin: 0;
-  background: #eaeaea;
+  background: #e5e5e5;
   font-family: Arial, sans-serif;
 }
 
@@ -16,37 +16,30 @@ body {
   gap: 12px;
 }
 
-/* ===== ÁLBUM ===== */
+/* ÁLBUM */
 .album {
   position: relative;
   width: min(92vw, 900px);
   background: #fff;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-  perspective: 2000px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.3);
+  perspective: 2500px;
   overflow: hidden;
   transition: aspect-ratio 0.6s ease;
 }
 
-/* FECHADO → 30x30 */
-.album.closed {
-  aspect-ratio: 1 / 1;
-}
+.album.closed { aspect-ratio: 1 / 1; }
+.album.open   { aspect-ratio: 2 / 1; }
 
-/* ABERTO → 60x30 */
-.album.open {
-  aspect-ratio: 2 / 1;
-}
-
-/* ===== CAPA ===== */
+/* CAPA */
 .cover {
   position: absolute;
   inset: 0;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
   transform-origin: left center;
-  transition: transform 0.8s cubic-bezier(.4,0,.2,1);
+  transition: transform 0.9s cubic-bezier(.4,0,.2,1);
 }
 
 .cover img {
@@ -56,11 +49,11 @@ body {
 }
 
 .album.open .cover {
-  transform: rotateY(-120deg);
+  transform: rotateY(-130deg);
   pointer-events: none;
 }
 
-/* ===== SPREAD ===== */
+/* SPREAD */
 .spread {
   display: none;
   width: 100%;
@@ -71,24 +64,22 @@ body {
   display: flex;
 }
 
-/* ===== LOMBADA ===== */
+/* LOMBADA */
 .spine {
   width: 2%;
   background: linear-gradient(
     to right,
-    rgba(0,0,0,0.25),
-    rgba(0,0,0,0.05),
-    rgba(0,0,0,0.25)
+    rgba(0,0,0,.35),
+    rgba(0,0,0,.1),
+    rgba(0,0,0,.35)
   );
 }
 
-/* ===== PÁGINAS ===== */
+/* PÁGINAS */
 .page-wrapper {
   width: 49%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  perspective: 1800px;
 }
 
 .page {
@@ -99,6 +90,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transform-origin: left center;
+  transition: transform .8s cubic-bezier(.25,.8,.25,1);
 }
 
 .page img {
@@ -107,18 +100,23 @@ body {
   object-fit: contain;
 }
 
-/* ===== VIRADA ===== */
-.page.turn-left {
-  transform: rotateY(-15deg);
-  transition: transform 0.9s cubic-bezier(.25,.8,.25,1);
+/* CURVATURA + SOMBRA */
+.page.turn {
+  transform:
+    rotateY(var(--angle))
+    skewY(var(--skew))
+    scaleX(var(--scale));
+  box-shadow:
+    var(--shadow-x) 0 40px rgba(0,0,0,var(--shadow-opacity));
 }
 
-.page.turn-right {
-  transform: rotateY(15deg);
-  transition: transform 0.9s cubic-bezier(.25,.8,.25,1);
+/* MOBILE */
+@media (max-width: 700px) {
+  .album { width: 96vw; }
+  .nav { font-size: 32px; }
 }
 
-/* ===== NAVEGAÇÃO ===== */
+/* NAV */
 .nav {
   background: none;
   border: none;
@@ -134,15 +132,4 @@ body {
   text-align: center;
   font-size: 13px;
   color: #666;
-}
-
-/* ===== MOBILE ===== */
-@media (max-width: 700px) {
-  .album {
-    width: 96vw;
-  }
-
-  .nav {
-    font-size: 32px;
-  }
 }
