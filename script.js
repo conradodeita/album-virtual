@@ -1,129 +1,73 @@
-/* ==============================
-ÁLBUM VIRTUAL – CARREGAMENTO
-============================== */
-
 let album = [];
 let index = 0;
 
-// Elementos do DOM
-const leftPage  = document.getElementById('left');
-const rightPage = document.getElementById('right');
-const nextBtn   = document.getElementById('next');
-const prevBtn   = document.getElementById('prev');
-const counter   = document.getElementById('counter');
+const single = document.getElementById('single');
+const left   = document.getElementById('left');
+const right  = document.getElementById('right');
 
-/* ==============================
-CARREGA O JSON DO ÁLBUM
-============================== */
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+const counter = document.getElementById('counter');
 
 fetch('album.json', { cache: 'no-store' })
-.then(res => {
-if (!res.ok) throw new Error('Falha ao carregar album.json');
-return res.json();
-})
-.then(data => {
-album = data;
-preloadImages();
-render();
-})
-.catch(err => console.error(err));
+  .then(r => r.json())
+  .then(data => {
+    album = data;
+    render();
+  });
 
-/* ==============================
-PRÉ-CARREGAMENTO SEGURO
-============================== */
-
-function preloadImages() {
-[index, index + 1, index + 2].forEach(i => {
-if (album[i] && album[i].image) {
-const img = new Image();
-img.src = encodeURI(album[i].image);
+function setBg(el, src) {
+  if (!src) {
+    el.style.backgroundImage = 'none';
+    return;
+  }
+  el.style.backgroundImage = `url("${encodeURI(src)}")`;
 }
-});
-}
-
-/* ==============================
-APLICA IMAGEM COM encodeURI
-============================== */
-
-function applyBackground(element, src) {
-if (!src) {
-element.style.backgroundImage = 'none';
-return;
-}
-
-const safeSrc = encodeURI(src);
-const img = new Image();
-
-img.onload = () => {
-element.style.backgroundImage = `url("${safeSrc}")`;
-};
-
-img.onerror = () => {
-console.error('Erro ao carregar imagem:', safeSrc);
-element.style.backgroundImage = 'none';
-};
-
-img.src = safeSrc;
-}
-
-/* ==============================
-RENDERIZAÇÃO DAS PÁGINAS
-============================== */
 
 function render() {
-const current = album[index];
-const next = album[index + 1];
+  const page = album[index];
 
-leftPage.className  = 'page left';
-rightPage.className = 'page right';
+  single.style.display = 'none';
+  left.style.display = 'block';
+  right.style.display = 'block';
 
-if (!current) return;
+  if (page.type === 'capa' || page.type === 'contracapa') {
+    single.style.display = 'block';
+    left.style.display = 'none';
+    right.style.display = 'none';
 
-// Capa ou contracapa
-if (current.type === 'capa' || current.type === 'contracapa') {
-applyBackground(leftPage, current.image);
-applyBackground(rightPage, null);
-counter.innerText = current.type.toUpperCase();
-preloadImages();
-return;
+    setBg(single, page.image);
+    counter.innerText = page.type.toUpperCase();
+    return;
+  }
+
+  if (page.type === 'spread') {
+    setBg(left, page.image);
+    setBg(right, page.image);
+    counter.innerText = `Páginas ${index + 1}–${index + 2}`;
+    return;
+  }
+
+  setBg(left, page.image);
+  setBg(right, album[index + 1]?.image);
+  counter.innerText = `Páginas ${index + 1}–${index + 2}`;
 }
-
-// Spread (imagem dupla)
-if (current.type === 'spread') {
-applyBackground(leftPage, current.image);
-applyBackground(rightPage, current.image);
-counter.innerText = `Páginas ${index + 1}–${index + 2}`;
-preloadImages();
-return;
-}
-
-// Páginas normais
-applyBackground(leftPage, current.image);
-applyBackground(rightPage, next ? next.image : null);
-counter.innerText = `Páginas ${index + 1}–${index + 2}`;
-preloadImages();
-}
-
-/* ==============================
-NAVEGAÇÃO
-============================== */
 
 function nextPage() {
-if (index < album.length - 1) {
-index += 2;
-render();
-}
+  if (index < album.length - 1) {
+    index += 2;
+    render();
+  }
 }
 
 function prevPage() {
-if (index > 0) {
-index -= 2;
-render();
-}
+  if (index > 0) {
+    index -= 2;
+    render();
+  }
 }
 
-nextBtn.addEventListener('click', nextPage);
-prevBtn.addEventListener('click', prevPage);
-
-rightPage.addEventListener('click', nextPage);
-leftPage.addEventListener('click', prevPage);
+next.onclick = nextPage;
+prev.onclick = prevPage;
+right.onclick = nextPage;
+left.onclick = prevPage;
