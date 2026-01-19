@@ -137,3 +137,17 @@ body {
   .book { width: 96vw; }
   .nav { font-size: 34px; }
 }
+
+/* ESTADO FECHADO (APENAS CAPA VISÍVEL) */
+.book.closed .spread {
+  display: block;
+}
+
+.book.closed .page.left {
+  display: none;
+}
+
+.book.closed .page.right {
+  width: 100%;
+}
+
