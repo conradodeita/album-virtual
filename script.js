@@ -3,7 +3,6 @@ let spreads = [];
 let index = 0;
 
 const book = document.getElementById('book');
-const coverImg = document.getElementById('coverImg');
 const leftImg = document.getElementById('leftImg');
 const rightImg = document.getElementById('rightImg');
 const counter = document.getElementById('pageCounter');
@@ -13,7 +12,6 @@ const rightPage = document.querySelector('.page.right');
 
 let dragging = false;
 let startX = 0;
-let currentX = 0;
 let activePage = null;
 let direction = null;
 
@@ -22,52 +20,57 @@ fetch('album.json')
   .then(r => r.json())
   .then(data => {
     album = data;
-    build();
+    buildSpreads();
     render();
   });
 
-function build() {
+function buildSpreads() {
   const capa = album.find(p => p.type === 'capa');
   const contra = album.find(p => p.type === 'contracapa');
   const pages = album.filter(p => p !== capa && p !== contra);
 
-  spreads.push({ type: 'capa', image: capa.image });
+  spreads = [];
 
+  // Spread 0 — capa à direita, esquerda vazia
+  spreads.push({
+    left: null,
+    right: capa.image,
+    type: 'capa'
+  });
+
+  // Miolo
   for (let i = 0; i < pages.length; i += 2) {
     spreads.push({
-      type: 'spread',
-      left: pages[i]?.image,
-      right: pages[i + 1]?.image
+      left: pages[i]?.image || null,
+      right: pages[i + 1]?.image || null,
+      type: 'spread'
     });
   }
 
-  spreads.push({ type: 'contracapa', image: contra.image });
+  // Último spread — contracapa à direita
+  spreads.push({
+    left: null,
+    right: contra.image,
+    type: 'contracapa'
+  });
 }
 
 function render() {
   const s = spreads[index];
 
-  if (s.type === 'capa' || s.type === 'contracapa') {
-    book.classList.remove('open');
-    coverImg.src = s.image;
-    counter.innerText = s.type.toUpperCase();
-    return;
-  }
-
-  book.classList.add('open');
   leftImg.src = s.left || '';
   rightImg.src = s.right || '';
-  counter.innerText = `PÁGINAS ${index} / ${spreads.length - 2}`;
+
+  counter.innerText =
+    s.type === 'capa'
+      ? 'CAPA'
+      : s.type === 'contracapa'
+        ? 'CONTRACAPA'
+        : `PÁGINAS ${index} / ${spreads.length - 2}`;
 }
 
 /* INTERAÇÃO */
 book.addEventListener('pointerdown', e => {
-  if (!book.classList.contains('open')) {
-    index++;
-    render();
-    return;
-  }
-
   dragging = true;
   startX = e.clientX;
 
@@ -86,8 +89,7 @@ book.addEventListener('pointerdown', e => {
 book.addEventListener('pointermove', e => {
   if (!dragging || !activePage) return;
 
-  currentX = e.clientX;
-  const delta = currentX - startX;
+  const delta = e.clientX - startX;
   const width = book.offsetWidth / 2;
   const progress = Math.max(-1, Math.min(1, delta / width));
 
@@ -99,31 +101,31 @@ book.addEventListener('pointermove', e => {
     `${-angle}px 0 60px rgba(0,0,0,${shadow})`;
 });
 
-book.addEventListener('pointerup', () => {
-  if (!dragging) return;
+book.addEventListener('pointerup', e => {
   dragging = false;
 
-  if (Math.abs(currentX - startX) > 120) {
-    direction === 'next' ? index++ : index--;
-    render();
+  const delta = e.clientX - startX;
+
+  if (Math.abs(delta) > 120) {
+    direction === 'next'
+      ? index = Math.min(index + 1, spreads.length - 1)
+      : index = Math.max(index - 1, 0);
   }
 
   activePage.style.transform = '';
   activePage.style.boxShadow = '';
   activePage = null;
+
+  render();
 });
 
-/* BOTÕES */
+/* BOTÕES — AGORA FUNCIONAM */
 document.querySelector('.next').onclick = () => {
-  if (index < spreads.length - 1) {
-    index++;
-    render();
-  }
+  index = Math.min(index + 1, spreads.length - 1);
+  render();
 };
 
 document.querySelector('.prev').onclick = () => {
-  if (index > 0) {
-    index--;
-    render();
-  }
+  index = Math.max(index - 1, 0);
+  render();
 };
