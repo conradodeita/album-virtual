@@ -1,6 +1,8 @@
 let album = [];
-let index = 0;
+let spreads = [];
+let spreadIndex = 0;
 
+/* ELEMENTOS */
 const book = document.getElementById('book');
 const coverImg = document.getElementById('coverImg');
 const leftImg = document.getElementById('leftImg');
@@ -22,32 +24,54 @@ fetch('album.json', { cache: 'no-store' })
   .then(r => r.json())
   .then(data => {
     album = data;
+    buildSpreads();
     render();
     preload();
   });
 
+/* ===============================
+   BUILD SPREADS (CHAVE!)
+================================ */
+function buildSpreads() {
+  spreads = [];
+
+  // capa
+  spreads.push({ type: 'capa', image: album[0].image });
+
+  // miolo (pares)
+  for (let i = 1; i < album.length - 1; i += 2) {
+    spreads.push({
+      type: 'spread',
+      left: album[i]?.image,
+      right: album[i + 1]?.image
+    });
+  }
+
+  // contracapa
+  spreads.push({
+    type: 'contracapa',
+    image: album[album.length - 1].image
+  });
+}
+
+/* ===============================
+   UTIL
+================================ */
 function setImg(el, src) {
   el.src = src ? encodeURI(src) : '';
 }
 
 /* ===============================
-   PRELOAD INTELIGENTE
+   PRELOAD
 ================================ */
 function preload() {
-  const candidates = [
-    index - 2,
-    index - 1,
-    index,
-    index + 1,
-    index + 2,
-    index + 3
-  ];
+  [-1, 0, 1].forEach(offset => {
+    const s = spreads[spreadIndex + offset];
+    if (!s) return;
 
-  candidates.forEach(i => {
-    if (album[i]?.image) {
-      const img = new Image();
-      img.src = encodeURI(album[i].image);
-    }
+    if (s.left) new Image().src = encodeURI(s.left);
+    if (s.right) new Image().src = encodeURI(s.right);
+    if (s.image) new Image().src = encodeURI(s.image);
   });
 }
 
@@ -55,60 +79,48 @@ function preload() {
    RENDER
 ================================ */
 function render() {
-  const page = album[index];
+  const s = spreads[spreadIndex];
 
-  // reset visual
   [leftPage, rightPage].forEach(p => {
     p.style.transform = '';
     p.style.boxShadow = '';
     p.style.transition = '';
   });
 
-  /* CAPA / CONTRACAPA */
-  if (page.type === 'capa' || page.type === 'contracapa') {
+  if (s.type === 'capa' || s.type === 'contracapa') {
     book.className = 'book closed';
-    setImg(coverImg, page.image);
-    counter.innerText = page.type.toUpperCase();
+    setImg(coverImg, s.image);
+    counter.innerText = s.type.toUpperCase();
     return;
   }
 
-  /* MIOLO */
   book.className = 'book open';
+  setImg(leftImg, s.left);
+  setImg(rightImg, s.right);
 
-  setImg(leftImg, album[index]?.image);
-  setImg(rightImg, album[index + 1]?.image);
-
-  counter.innerText = `Páginas ${index + 1} – ${index + 2}`;
+  counter.innerText = `SPREAD ${spreadIndex}`;
   preload();
 }
 
 /* ===============================
-   PAGINAÇÃO SEGURA
+   NAVEGAÇÃO
 ================================ */
-function nextIndex() {
-  // capa → primeira dupla
-  if (index === 0) return 1;
-
-  // miolo → avança 2
-  if (index + 2 < album.length - 1) return index + 2;
-
-  // última dupla → contracapa
-  return album.length - 1;
+function nextSpread() {
+  if (spreadIndex < spreads.length - 1) {
+    spreadIndex++;
+    render();
+  }
 }
 
-function prevIndex() {
-  // contracapa → última dupla
-  if (index === album.length - 1) return album.length - 3;
-
-  // miolo → volta 2
-  if (index - 2 >= 1) return index - 2;
-
-  // volta para capa
-  return 0;
+function prevSpread() {
+  if (spreadIndex > 0) {
+    spreadIndex--;
+    render();
+  }
 }
 
 /* ===============================
-   ARRASTE CONTÍNUO
+   ARRASTE FÍSICO
 ================================ */
 book.addEventListener('pointerdown', e => {
   startX = e.clientX;
@@ -154,31 +166,28 @@ book.addEventListener('pointerup', () => {
    FINALIZAÇÃO
 ================================ */
 function resetPage() {
-  activePage.style.transition = 'transform .4s ease';
+  activePage.style.transition = 'transform .35s ease';
   activePage.style.transform = '';
   activePage.style.boxShadow = '';
 }
 
 function finalize(direction) {
-  activePage.style.transition = 'transform .35s ease';
-
+  activePage.style.transition = 'transform .3s ease';
   activePage.style.transform =
     direction === 'next'
       ? 'rotateY(-160deg)'
       : 'rotateY(160deg)';
 
   setTimeout(() => {
-    index =
-      direction === 'next'
-        ? nextIndex()
-        : prevIndex();
-
     activePage.style.transition = '';
     activePage.style.transform = '';
     activePage.style.boxShadow = '';
 
-    render();
-  }, 360);
+    direction === 'next'
+      ? nextSpread()
+      : prevSpread();
+
+  }, 320);
 }
 
 /* ===============================
