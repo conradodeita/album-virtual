@@ -13,76 +13,82 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
 }
 
-.book {
+.album {
   position: relative;
-  width: 900px;
-  height: 600px;
+  width: min(90vw, 900px);
+  aspect-ratio: 1 / 1;
   background: #fff;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
   overflow: hidden;
 }
 
-.page {
+/* ===== CAPA ===== */
+.cover {
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
 }
 
-.single {
-  position: absolute;
-  inset: 0;
+/* ===== PÁGINAS ===== */
+.pages {
   display: none;
-}
-
-.spread {
-  display: flex;
   width: 100%;
   height: 100%;
 }
 
-.left, .right {
+.page {
   width: 50%;
   height: 100%;
+  background-size: cover;
+  background-position: center;
 }
 
-.left {
-  border-right: 1px solid #ddd;
+.pages {
+  display: flex;
 }
 
-.right {
-  border-left: 1px solid #ddd;
+/* ===== ESTADOS ===== */
+.album.closed .pages {
+  display: none;
 }
 
-.turn {
-  animation: turn 0.6s ease;
+.album.closed .cover {
+  display: block;
 }
 
-@keyframes turn {
-  from {
-    transform: translateX(30px);
-    box-shadow: -30px 0 40px rgba(0,0,0,0.3);
-  }
-  to {
-    transform: translateX(0);
-    box-shadow: none;
-  }
+.album.open .cover {
+  display: none;
 }
 
+.album.open .pages {
+  display: flex;
+}
+
+/* ===== NAVEGAÇÃO ===== */
 .nav {
   background: none;
   border: none;
-  font-size: 48px;
+  font-size: 42px;
   cursor: pointer;
   color: #444;
-  padding: 20px;
 }
 
 #counter {
   position: fixed;
-  bottom: 20px;
+  bottom: 15px;
   width: 100%;
   text-align: center;
   font-size: 13px;
   color: #666;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 600px) {
+  .album {
+    width: 95vw;
+  }
 }
