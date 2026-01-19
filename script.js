@@ -10,13 +10,48 @@ const counter = document.getElementById('pageCounter');
 const btnNext = document.querySelector('.nav.next');
 const btnPrev = document.querySelector('.nav.prev');
 
-/* LOAD */
+/* ===============================
+   AUTO FOLHEAR (DESKTOP)
+================================ */
+let autoFlipTimer = null;
+let autoFlipActive = false;
+
+const isDesktop = () =>
+  window.matchMedia('(pointer: fine)').matches &&
+  window.innerWidth > 900;
+
+function startAutoFlip() {
+  if (!isDesktop() || autoFlipActive) return;
+
+  autoFlipActive = true;
+
+  autoFlipTimer = setInterval(() => {
+    if (index < spreads.length - 1) {
+      index++;
+      render();
+    } else {
+      stopAutoFlip();
+    }
+  }, 2600); // tempo entre viradas
+}
+
+function stopAutoFlip() {
+  autoFlipActive = false;
+  clearInterval(autoFlipTimer);
+}
+
+/* ===============================
+   LOAD
+================================ */
 fetch('album.json', { cache: 'no-store' })
   .then(r => r.json())
   .then(data => {
     album = data;
     buildSpreads();
     render();
+
+    // inicia automático após alguns segundos
+    setTimeout(startAutoFlip, 3000);
   });
 
 function buildSpreads() {
@@ -26,7 +61,7 @@ function buildSpreads() {
 
   spreads = [];
 
-  // CAPA (lado direito apenas)
+  // CAPA
   spreads.push({ left: null, right: capa.image, type: 'capa' });
 
   // MIOLO
@@ -46,7 +81,6 @@ function render() {
   const s = spreads[index];
   if (!s) return;
 
-  // Estado físico do livro
   if (index === 0) {
     book.classList.add('closed');
   } else {
@@ -64,8 +98,11 @@ function render() {
         : `PÁGINAS ${index} / ${spreads.length - 2}`;
 }
 
-/* BOTÕES */
+/* ===============================
+   BOTÕES (INTERAÇÃO PARA AUTO)
+================================ */
 btnNext.onclick = () => {
+  stopAutoFlip();
   if (index < spreads.length - 1) {
     index++;
     render();
@@ -73,8 +110,16 @@ btnNext.onclick = () => {
 };
 
 btnPrev.onclick = () => {
+  stopAutoFlip();
   if (index > 0) {
     index--;
     render();
   }
 };
+
+/* ===============================
+   QUALQUER INTERAÇÃO CANCELA AUTO
+================================ */
+['pointerdown', 'wheel', 'keydown'].forEach(evt => {
+  window.addEventListener(evt, stopAutoFlip, { once: true });
+});
