@@ -18,69 +18,30 @@ body {
   gap: 18px;
 }
 
-/* LIVRO */
 .book {
   position: relative;
   width: min(94vw, 1100px);
   aspect-ratio: 2 / 1;
-  perspective: 4200px;
+  perspective: 5000px;
 }
 
-/* Sombra externa */
-.book::after {
-  content: '';
-  position: absolute;
-  inset: -10% -6%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0,0,0,.35),
-    transparent 70%
-  );
-  filter: blur(35px);
-  z-index: -1;
-}
-
-/* SPREAD */
 .spread {
   width: 100%;
   height: 100%;
   display: flex;
   background: white;
   position: relative;
-  overflow: hidden;
 }
 
-/* Sombra central (lombada invisível) */
-.spread::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 3%;
-  height: 100%;
-  transform: translateX(-50%);
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0,0,0,.18),
-    transparent 70%
-  );
-  z-index: 2;
-}
-
-/* PÁGINAS */
 .page {
   width: 50%;
-  height: 100%;
+  aspect-ratio: 1 / 1;
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transform-style: preserve-3d;
 }
-
-.page.left { transform-origin: left center; }
-.page.right { transform-origin: right center; }
 
 .page img {
   width: 100%;
@@ -88,15 +49,33 @@ body {
   object-fit: contain;
 }
 
-/* =========================
-   ESTADO FECHADO (CAPA)
-========================= */
+/* ESTADO FECHADO (CAPA) */
 .book.closed .page.left {
-  visibility: hidden;   /* NÃO ocupa espaço visual */
+  display: none;
 }
 
 .book.closed .page.right {
-  transform: translateX(0); /* permanece na metade direita */
+  width: 100%;
+}
+
+/* FLIP PAGE (FANTASMA) */
+.flip-page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: white;
+  transform-origin: right center;
+  transform-style: preserve-3d;
+  display: none;
+  z-index: 10;
+}
+
+.flip-page img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* CONTROLES */
@@ -104,33 +83,13 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(255,255,255,.9);
+  background: white;
   border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 42px;
-  font-weight: bold;
-  color: #333;
   cursor: pointer;
   box-shadow: 0 10px 25px rgba(0,0,0,.25);
-  transition: transform .15s ease, box-shadow .15s ease;
-  z-index: 20;
 }
 
-.nav:hover {
-  transform: scale(1.12);
-  box-shadow: 0 14px 30px rgba(0,0,0,.35);
-}
-
-.nav:active {
-  transform: scale(.95);
-}
-
-.nav.prev { margin-right: 10px; }
-.nav.next { margin-left: 10px; }
-
-/* CONTADOR */
 #pageCounter {
   position: fixed;
   bottom: 16px;
@@ -138,14 +97,4 @@ body {
   text-align: center;
   font-size: 13px;
   color: #555;
-}
-
-/* MOBILE */
-@media (max-width: 720px) {
-  .book { width: 96vw; }
-  .nav {
-    width: 54px;
-    height: 54px;
-    font-size: 34px;
-  }
 }
