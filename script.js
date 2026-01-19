@@ -30,10 +30,14 @@ function render() {
     rightImg.style.opacity = '1';
     rightImg.style.display = 'block';
   } else {
-    rightImg.style.display = 'none';
+    // Se não houver página direita, mostrar fundo branco
+    rightImg.style.display = 'block';
+    rightImg.style.opacity = '1';
+    rightImg.src = '';
+    rightImg.style.backgroundColor = '#fff';
   }
   
-  // Atualizar contador
+  // Atualizar contador com informação especial para páginas duplas
   updateCounter();
 }
 
@@ -41,7 +45,20 @@ function updateCounter() {
   const total = pages.length;
   const currentPage = Math.floor(current / 2) + 1;
   const totalPages = Math.ceil(total / 2);
-  counter.textContent = `Página ${currentPage} de ${totalPages}`;
+  
+  // Verificar se é uma página dupla
+  const leftPage = pages[current];
+  const rightPage = pages[current + 1];
+  const isDoublePage = leftPage && rightPage && 
+                      (leftPage.image.includes('_esq') && rightPage.image.includes('_dir')) ||
+                      (leftPage.image.includes('_esq.jpg') && rightPage.image.includes('_dir.jpg'));
+  
+  let counterText = `Página ${currentPage} de ${totalPages}`;
+  if (isDoublePage) {
+    counterText += " (Página Dupla)";
+  }
+  
+  counter.textContent = counterText;
 }
 
 function updateButtons() {
@@ -56,9 +73,14 @@ function flipNext() {
   updateButtons();
   
   // Preparar a página que será virada
-  flipImg.src = pages[current + 1].image;
+  flipImg.src = pages[current + 1]?.image || '';
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(0deg)';
+  
+  // Se não houver imagem, definir fundo branco
+  if (!pages[current + 1]?.image) {
+    flipPage.style.backgroundColor = '#fff';
+  }
   
   // Esconder a página direita original
   rightImg.style.opacity = '0';
@@ -84,6 +106,7 @@ function flipNext() {
     flipPage.style.transform = 'rotateY(0deg)';
     flipPage.style.display = 'none';
     flipPage.style.boxShadow = 'none';
+    flipPage.style.backgroundColor = '';
     
     // Atualizar display
     render();
@@ -109,6 +132,11 @@ function flipPrev() {
     '-30px 0 50px rgba(0,0,0,0.3), ' +
     'inset -5px 0 10px rgba(0,0,0,0.1)';
   
+  // Se não houver imagem, definir fundo branco
+  if (!pages[current + 1]?.image) {
+    flipPage.style.backgroundColor = '#fff';
+  }
+  
   // Esconder páginas atuais temporariamente
   leftImg.style.opacity = '0.5';
   rightImg.style.opacity = '0';
@@ -126,6 +154,7 @@ function flipPrev() {
     flipPage.style.transform = 'rotateY(0deg)';
     flipPage.style.display = 'none';
     flipPage.style.boxShadow = 'none';
+    flipPage.style.backgroundColor = '';
     
     // Atualizar display
     render();
@@ -174,3 +203,22 @@ document.addEventListener('touchend', (e) => {
     flipNext();
   }
 });
+
+// Verificar se as imagens existem
+function checkImages() {
+  pages.forEach(page => {
+    const img = new Image();
+    img.onerror = function() {
+      console.warn(`Imagem não encontrada: ${page.image}`);
+    };
+    img.src = page.image;
+  });
+}
+
+// Executar após carregar as páginas
+fetch('album.json')
+  .then(r => r.json())
+  .then(data => {
+    pages = data;
+    checkImages();
+  });
