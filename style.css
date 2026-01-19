@@ -30,11 +30,6 @@ body {
   height: min(80vh, 700px);
   perspective: 2000px;
   background: transparent;
-  transition: transform 0.6s ease;
-}
-
-.book.closed {
-  transform: scale(0.95);
 }
 
 .page {
@@ -80,22 +75,6 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.3s ease;
-}
-
-/* Estado de livro fechado */
-.book.closed .page.left,
-.book.end-closed .page.left {
-  width: 100%;
-  border-radius: 4px;
-  box-shadow: 
-    0 15px 35px rgba(0,0,0,0.3),
-    inset 0 0 0 1px rgba(255,255,255,0.1);
-}
-
-.book.closed .page.right,
-.book.end-closed .page.right {
-  display: none;
 }
 
 /* BOTÕES */
@@ -143,7 +122,6 @@ body {
   padding: 8px 20px;
   border-radius: 20px;
   font-weight: 500;
-  min-width: 150px;
 }
 
 @media (max-width: 768px) {
@@ -159,10 +137,5 @@ body {
   
   .book {
     height: min(70vh, 500px);
-  }
-  
-  #pageCounter {
-    font-size: 12px;
-    padding: 6px 15px;
   }
 }
