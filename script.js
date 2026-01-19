@@ -1,13 +1,14 @@
 let album = [];
 let index = 0;
 
-const single = document.getElementById('single');
-const left   = document.getElementById('left');
-const right  = document.getElementById('right');
-
-const prev = document.getElementById('prev');
-const next = document.getElementById('next');
+const albumEl = document.getElementById('album');
+const cover   = document.getElementById('cover');
+const left    = document.getElementById('left');
+const right   = document.getElementById('right');
 const counter = document.getElementById('counter');
+
+const nextBtn = document.getElementById('next');
+const prevBtn = document.getElementById('prev');
 
 fetch('album.json', { cache: 'no-store' })
   .then(r => r.json())
@@ -16,58 +17,50 @@ fetch('album.json', { cache: 'no-store' })
     render();
   });
 
-function setBg(el, src) {
-  if (!src) {
-    el.style.backgroundImage = 'none';
-    return;
-  }
-  el.style.backgroundImage = `url("${encodeURI(src)}")`;
+function bg(el, src) {
+  el.style.backgroundImage = src
+    ? `url("${encodeURI(src)}")`
+    : 'none';
 }
 
 function render() {
   const page = album[index];
 
-  single.style.display = 'none';
-  left.style.display = 'block';
-  right.style.display = 'block';
-
   if (page.type === 'capa' || page.type === 'contracapa') {
-    single.style.display = 'block';
-    left.style.display = 'none';
-    right.style.display = 'none';
-
-    setBg(single, page.image);
+    albumEl.className = 'album closed';
+    bg(cover, page.image);
     counter.innerText = page.type.toUpperCase();
     return;
   }
 
+  albumEl.className = 'album open';
+
   if (page.type === 'spread') {
-    setBg(left, page.image);
-    setBg(right, page.image);
-    counter.innerText = `Páginas ${index + 1}–${index + 2}`;
-    return;
+    bg(left, page.image);
+    bg(right, page.image);
+  } else {
+    bg(left, page.image);
+    bg(right, album[index + 1]?.image);
   }
 
-  setBg(left, page.image);
-  setBg(right, album[index + 1]?.image);
   counter.innerText = `Páginas ${index + 1}–${index + 2}`;
 }
 
 function nextPage() {
   if (index < album.length - 1) {
-    index += 2;
+    index += index === 0 ? 1 : 2;
     render();
   }
 }
 
 function prevPage() {
   if (index > 0) {
-    index -= 2;
+    index -= index <= 1 ? 1 : 2;
     render();
   }
 }
 
-next.onclick = nextPage;
-prev.onclick = prevPage;
+nextBtn.onclick = nextPage;
+prevBtn.onclick = prevPage;
 right.onclick = nextPage;
 left.onclick = prevPage;
