@@ -10,13 +10,16 @@ const counter = document.getElementById('pageCounter');
 const leftPage = document.querySelector('.page.left');
 const rightPage = document.querySelector('.page.right');
 
+const btnNext = document.querySelector('.nav.next');
+const btnPrev = document.querySelector('.nav.prev');
+
 let dragging = false;
 let startX = 0;
 let activePage = null;
 let direction = null;
 
 /* LOAD */
-fetch('album.json')
+fetch('album.json', { cache: 'no-store' })
   .then(r => r.json())
   .then(data => {
     album = data;
@@ -31,14 +34,8 @@ function buildSpreads() {
 
   spreads = [];
 
-  // Spread 0 — capa à direita, esquerda vazia
-  spreads.push({
-    left: null,
-    right: capa.image,
-    type: 'capa'
-  });
+  spreads.push({ left: null, right: capa.image, type: 'capa' });
 
-  // Miolo
   for (let i = 0; i < pages.length; i += 2) {
     spreads.push({
       left: pages[i]?.image || null,
@@ -47,16 +44,12 @@ function buildSpreads() {
     });
   }
 
-  // Último spread — contracapa à direita
-  spreads.push({
-    left: null,
-    right: contra.image,
-    type: 'contracapa'
-  });
+  spreads.push({ left: null, right: contra.image, type: 'contracapa' });
 }
 
 function render() {
   const s = spreads[index];
+  if (!s) return;
 
   leftImg.src = s.left || '';
   rightImg.src = s.right || '';
@@ -69,7 +62,28 @@ function render() {
         : `PÁGINAS ${index} / ${spreads.length - 2}`;
 }
 
-/* INTERAÇÃO */
+/* ===============================
+   BOTÕES (PRIORIDADE)
+================================ */
+btnNext.addEventListener('click', e => {
+  e.stopPropagation();
+  if (index < spreads.length - 1) {
+    index++;
+    render();
+  }
+});
+
+btnPrev.addEventListener('click', e => {
+  e.stopPropagation();
+  if (index > 0) {
+    index--;
+    render();
+  }
+});
+
+/* ===============================
+   ARRASTE (SWIPE)
+================================ */
 book.addEventListener('pointerdown', e => {
   dragging = true;
   startX = e.clientX;
@@ -102,6 +116,7 @@ book.addEventListener('pointermove', e => {
 });
 
 book.addEventListener('pointerup', e => {
+  if (!dragging) return;
   dragging = false;
 
   const delta = e.clientX - startX;
@@ -112,20 +127,11 @@ book.addEventListener('pointerup', e => {
       : index = Math.max(index - 1, 0);
   }
 
-  activePage.style.transform = '';
-  activePage.style.boxShadow = '';
-  activePage = null;
+  if (activePage) {
+    activePage.style.transform = '';
+    activePage.style.boxShadow = '';
+  }
 
+  activePage = null;
   render();
 });
-
-/* BOTÕES — AGORA FUNCIONAM */
-document.querySelector('.next').onclick = () => {
-  index = Math.min(index + 1, spreads.length - 1);
-  render();
-};
-
-document.querySelector('.prev').onclick = () => {
-  index = Math.max(index - 1, 0);
-  render();
-};
