@@ -9,7 +9,11 @@
   },
   {
     "type": "pagina",
-    "image": "pagina02.jpg"
+    "image": "pagina02_esq.jpg"
+  },
+  {
+    "type": "pagina", 
+    "image": "pagina02_dir.jpg"
   },
   {
     "type": "pagina",
@@ -21,7 +25,11 @@
   },
   {
     "type": "pagina",
-    "image": "pagina05.jpg"
+    "image": "pagina05_esq.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina05_dir.jpg"
   },
   {
     "type": "pagina",
@@ -32,5 +40,3 @@
     "image": "ContraCapa.jpg"
   }
 ]
-
-
