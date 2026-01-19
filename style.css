@@ -1,0 +1,116 @@
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  background: #e4e4e4;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+.stage {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* LIVRO */
+.book {
+  position: relative;
+  width: min(92vw, 960px);
+  background: white;
+  perspective: 2800px;
+  box-shadow: 0 35px 90px rgba(0,0,0,.35);
+  transition: aspect-ratio .6s ease;
+}
+
+.book.closed { aspect-ratio: 1 / 1; }
+.book.open   { aspect-ratio: 2 / 1; }
+
+.book.closed .cover { display: block; }
+.book.open .cover { display: none; }
+
+/* CAPA */
+.cover {
+  position: absolute;
+  inset: 0;
+  background: white;
+  transform-origin: left center;
+  transition: transform 1s cubic-bezier(.4,0,.2,1);
+  z-index: 3;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.book.open .cover {
+  transform: rotateY(-145deg);
+  pointer-events: none;
+}
+
+/* SPREAD */
+.spread {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.book.open .spread {
+  display: flex;
+}
+
+/* PÁGINAS */
+.page {
+  width: 50%;
+  aspect-ratio: 1 / 1;
+  background: white;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: left center;
+}
+
+.page.right {
+  transform-origin: right center;
+}
+
+.page img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* NAV */
+.nav {
+  background: none;
+  border: none;
+  font-size: 42px;
+  cursor: pointer;
+  color: #444;
+}
+
+/* CONTADOR */
+#pageCounter {
+  position: fixed;
+  bottom: 14px;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+}
+
+/* MOBILE */
+@media (max-width: 720px) {
+  .book { width: 96vw; }
+  .nav { font-size: 34px; }
+}

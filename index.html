@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Álbum Virtual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="stage">
+
+  <button class="nav prev">‹</button>
+
+  <div id="book" class="book closed">
+
+    <!-- CAPA -->
+    <div class="cover">
+      <img id="coverImg">
+    </div>
+
+    <!-- MIOLO (SEM LOMBADA VISUAL) -->
+    <div class="spread">
+
+      <div class="page left">
+        <img id="leftImg">
+      </div>
+
+      <div class="page right">
+        <img id="rightImg">
+      </div>
+
+    </div>
+
+  </div>
+
+  <button class="nav next">›</button>
+
+</div>
+
+<div id="pageCounter"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
