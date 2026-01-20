@@ -1,50 +1,71 @@
+/* RESET COMPLETO PARA MOBILE */
 * {
   box-sizing: border-box;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
 }
 
 body {
   margin: 0;
-  background: transparent !important; /* Fundo transparente */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow-x: hidden;
+  padding: 0;
+  background: transparent !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden !important;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
-/* Remove qualquer gradiente ou cor do stage */
+/* STAGE - Container principal */
 .stage {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  gap: 20px;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100%;
+  margin: 0;
+  gap: 10px;
   padding: 10px;
+  position: relative;
   background: transparent;
 }
 
-/* Livro com fundo transparente */
+/* BOOK - Container do álbum */
 .book {
   position: relative;
-  width: min(95vw, 1200px);
-  height: min(85vh, 700px);
-  perspective: 1500px;
-  background: transparent !important; /* Transparente */
+  width: 95vw;
+  height: 80vh;
+  perspective: 1000px;
+  background: transparent !important;
   border-radius: 8px;
+  touch-action: none;
 }
 
-/* Páginas com fundo transparente */
+/* PÁGINAS */
 .page {
   position: absolute;
   width: 50%;
   height: 100%;
-  background: transparent !important; /* Transparente */
+  background: transparent !important;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -69,190 +90,307 @@ body {
   transform-origin: left center;
   z-index: 10;
   display: none;
-  background: transparent !important; /* Transparente */
+  background: transparent !important;
 }
 
-/* Imagens mantêm transparência */
+/* IMAGENS - Otimizadas para mobile */
 .page img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
-  background: transparent !important; /* Transparente */
+  background: transparent !important;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
 }
 
-/* Botões com transparência reduzida */
+/* BOTÕES DE NAVEGAÇÃO - Grandes para touch */
 .nav {
-  width: min(60px, 12vw);
-  height: min(60px, 12vw);
-  min-width: 44px;
-  min-height: 44px;
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px !important;
+  height: 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85); /* Mais transparente */
-  border: none;
-  font-size: min(36px, 7vw);
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  font-size: 40px !important;
+  font-weight: bold;
   cursor: pointer;
   color: #1a2980;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  user-select: none;
 }
 
-.nav:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.95);
-  transform: scale(1.1);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+.nav.prev {
+  left: 15px;
 }
 
-.nav:active:not(:disabled) {
-  transform: scale(0.95);
+.nav.next {
+  right: 15px;
+}
+
+.nav:active {
+  transform: translateY(-50%) scale(0.95);
+  background: rgba(255, 255, 255, 1) !important;
 }
 
 .nav:disabled {
-  opacity: 0.2;
+  opacity: 0.3;
   cursor: not-allowed;
-  transform: none;
-  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-50%) scale(1);
 }
 
-/* Contador com transparência */
+/* CONTADOR DE PÁGINAS - Posição fixa no mobile */
 #pageCounter {
-  margin-top: 20px;
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
-  font-size: clamp(14px, 3vw, 18px);
-  color: rgba(0, 0, 0, 0.8); /* Cor escura para contraste */
-  background: rgba(255, 255, 255, 0.7); /* Semi-transparente */
-  padding: 12px clamp(20px, 5vw, 30px);
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.8);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 24px;
   border-radius: 25px;
-  font-weight: 500;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.3);
-  max-width: 90%;
-  word-wrap: break-word;
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  min-width: 180px;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
-/* Remove sombras desnecessárias */
-.page.left, .page.right {
-  box-shadow: none;
+/* INDICADOR DE SWIPE */
+.swipe-hint {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  animation: pulse 2s infinite;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Efeito de borda sutil para demarcar páginas */
-.page {
-  border: 1px solid rgba(0, 0, 0, 0.1); /* Borda sutil */
+.swipe-hint::before {
+  content: "👆";
+  font-size: 16px;
 }
 
-.page.left {
-  border-right: none;
-  border-radius: 8px 0 0 8px;
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 
-.page.right {
-  border-left: none;
-  border-radius: 0 8px 8px 0;
-}
+/* RESPONSIVIDADE ESPECÍFICA POR ORIENTAÇÃO */
 
-/* RESPONSIVIDADE */
-
-@media (max-width: 768px) {
-  .stage {
-    gap: 10px;
-    padding: 5px;
-  }
-  
+/* RETRATO (portrait) - Altura maior que largura */
+@media (orientation: portrait) {
   .book {
-    width: 98vw;
-    height: min(80vh, 500px);
-    perspective: 1000px;
+    width: 95vw;
+    height: 70vh;
   }
   
   .nav {
-    width: 50px;
-    height: 50px;
-    font-size: 30px;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(5px);
-  }
-  
-  .page {
-    border: 0.5px solid rgba(0, 0, 0, 0.05);
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 5px;
-    justify-content: flex-start;
-    padding-top: 40px;
-    background: transparent;
-  }
-  
-  .stage {
-    gap: 8px;
-  }
-  
-  .book {
-    height: 65vh;
-    max-height: 450px;
-    width: 100%;
-    border-radius: 6px;
-  }
-  
-  .page {
-    border-radius: 6px !important;
-    border: 0.5px solid rgba(0, 0, 0, 0.05);
-  }
-  
-  .page.left {
-    border-radius: 6px 0 0 6px !important;
-  }
-  
-  .page.right {
-    border-radius: 0 6px 6px 0 !important;
-  }
-  
-  .nav {
-    width: 44px;
-    height: 44px;
-    font-size: 26px;
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.85);
-  }
-  
-  .nav.prev {
-    left: 5px;
-  }
-  
-  .nav.next {
-    right: 5px;
+    width: 55px !important;
+    height: 55px !important;
+    font-size: 35px !important;
   }
   
   #pageCounter {
+    bottom: 70px;
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+  
+  .swipe-hint {
+    bottom: 25px;
     font-size: 13px;
-    padding: 10px 15px;
-    margin-top: 15px;
-    background: rgba(255, 255, 255, 0.8);
-    color: rgba(0, 0, 0, 0.8);
+    padding: 8px 16px;
   }
 }
 
-/* Ajuste para orientação paisagem */
-@media (max-width: 768px) and (orientation: landscape) {
+/* PAISAGEM (landscape) - Largura maior que altura */
+@media (orientation: landscape) {
   .book {
+    width: 90vw;
     height: 85vh;
-    max-height: none;
+  }
+  
+  .nav {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 30px !important;
+  }
+  
+  .nav.prev {
+    left: 10px;
+  }
+  
+  .nav.next {
+    right: 10px;
+  }
+  
+  #pageCounter {
+    bottom: 15px;
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+  
+  .swipe-hint {
+    display: none; /* Esconde em landscape pois o swipe é mais natural */
+  }
+}
+
+/* TELAS MUITO PEQUENAS */
+@media (max-width: 320px) {
+  .book {
+    height: 65vh;
+  }
+  
+  .nav {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 30px !important;
+  }
+  
+  .nav.prev {
+    left: 10px;
+  }
+  
+  .nav.next {
+    right: 10px;
+  }
+  
+  #pageCounter {
+    font-size: 12px;
+    padding: 8px 16px;
+    min-width: 160px;
+  }
+}
+
+/* TELAS MÉDIAS (Tablets) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .book {
+    width: 90vw;
+    height: 75vh;
+  }
+  
+  .nav {
+    width: 70px !important;
+    height: 70px !important;
+    font-size: 45px !important;
+  }
+}
+
+/* DESKTOP (Acima de 1024px) */
+@media (min-width: 1025px) {
+  .book {
+    width: min(90vw, 1200px);
+    height: min(80vh, 700px);
+    perspective: 2000px;
+  }
+  
+  .nav {
+    position: relative;
+    top: auto;
+    transform: none;
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 40px !important;
+  }
+  
+  .nav.prev {
+    left: auto;
+  }
+  
+  .nav.next {
+    right: auto;
   }
   
   .stage {
-    height: 90vh;
+    gap: 40px;
+    padding: 20px;
+  }
+  
+  #pageCounter {
+    position: static;
+    transform: none;
+    margin-top: 25px;
+    background: rgba(255, 255, 255, 0.8);
+  }
+  
+  .swipe-hint {
+    display: none; /* Não mostra em desktop */
   }
 }
 
-/* Remove qualquer gradiente residual */
-body::before, .stage::before, .book::before {
-  display: none !important;
+/* AJUSTES PARA IFRAME */
+@media (max-width: 768px) {
+  /* Forçar dimensions no iframe */
+  html, body {
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    position: fixed !important;
+  }
+  
+  /* Prevenir zoom em iOS */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Ajustar tamanho do texto para legibilidade */
+  body {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+}
+
+/* CORREÇÃO PARA SAFARI IOS */
+@supports (-webkit-touch-callout: none) {
+  .book {
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    height: -webkit-fill-available;
+  }
+}
+
+/* PREVENIR COMPORTAMENTO DE PULL-TO-REFRESH */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* MELHORAR RENDERIZAÇÃO EM MOBILE */
+.page img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
