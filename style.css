@@ -1,413 +1,54 @@
-* {
-  box-sizing: border-box;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-}
+/* Adicione estas regras ao seu CSS existente */
 
-body {
-  margin: 0;
-  background: linear-gradient(135deg, #1a2980, #26d0ce);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 10px;
-  overflow-x: hidden;
+/* Estilo especial para páginas duplas no mobile */
+.page.single.double-page-mobile {
+  border: 2px solid #ff9800;
   position: relative;
 }
 
-/* STAGE - Container principal */
-.stage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  position: relative;
-}
-
-/* MODO DESKTOP (acima de 768px) */
-@media (min-width: 769px) {
-  .stage {
-    gap: 40px;
-    padding: 20px;
-  }
-  
-  .book {
-    width: 1200px;
-    height: 700px;
-    display: block;
-  }
-  
-  .page.single {
-    display: none !important;
-  }
-  
-  .page.left,
-  .page.right {
-    display: flex;
-  }
-  
-  .page-dots {
-    display: none;
-  }
-}
-
-/* MODO MOBILE (até 768px) */
-@media (max-width: 768px) {
-  body {
-    padding: 5px;
-    justify-content: flex-start;
-    padding-top: 60px;
-  }
-  
-  .stage {
-    flex-direction: column;
-    gap: 15px;
-    padding: 10px;
-    width: 100%;
-    height: calc(100vh - 150px);
-  }
-  
-  .book {
-    width: 95vw;
-    height: 70vh;
-    display: flex;
-    flex-direction: column;
-    perspective: 1000px;
-  }
-  
-  /* Esconde páginas duplas no mobile */
-  .page.left,
-  .page.right {
-    display: none !important;
-  }
-  
-  .page.single {
-    display: flex !important;
-    position: relative;
-    width: 100% !important;
-    height: 100% !important;
-    left: 0 !important;
-    right: 0 !important;
-    border-radius: 8px !important;
-  }
-  
-  .nav {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 50px !important;
-    height: 50px !important;
-    font-size: 28px !important;
-    background: rgba(255, 255, 255, 0.9) !important;
-    backdrop-filter: blur(10px);
-    z-index: 1000;
-  }
-  
-  .nav.prev {
-    left: 10px;
-  }
-  
-  .nav.next {
-    right: 10px;
-  }
-  
-  /* Botões de navegação na parte inferior */
-  .nav-bottom {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-  }
-  
-  .nav-bottom .nav {
-    position: static;
-    transform: none;
-  }
-}
-
-/* BOOK - Container do álbum */
-.book {
-  position: relative;
-  perspective: 2000px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  box-shadow: 
-    0 30px 60px rgba(0,0,0,0.3),
-    0 0 0 1px rgba(255,255,255,0.1) inset;
-}
-
-/* PÁGINAS - Estilos base */
-.page {
+.page.single.double-page-mobile::before {
+  content: "🖼️ Página Dupla";
   position: absolute;
-  background: white;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-  border-radius: 0 8px 8px 0;
-}
-
-.page.left {
-  left: 0;
-  width: 50%;
-  height: 100%;
-  border-radius: 8px 0 0 8px;
-  box-shadow: 
-    -15px 0 30px rgba(0,0,0,0.15),
-    1px 0 0 rgba(0,0,0,0.05) inset;
-}
-
-.page.right {
-  right: 0;
-  width: 50%;
-  height: 100%;
-  transform-origin: left center;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 
-    5px 0 15px rgba(0,0,0,0.1),
-    -1px 0 0 rgba(0,0,0,0.05) inset;
-}
-
-.page.single {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  box-shadow: 
-    0 10px 30px rgba(0,0,0,0.2),
-    inset 0 0 0 1px rgba(0,0,0,0.05);
-}
-
-.page.flip-page {
-  right: 0;
-  transform-origin: left center;
-  z-index: 10;
-  display: none;
-  background: white;
-  border-radius: 0 8px 8px 0;
-}
-
-/* IMAGENS */
-.page img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: white;
-  display: block;
-}
-
-/* BOTÕES DE NAVEGAÇÃO */
-.nav {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
-  font-size: 36px;
-  cursor: pointer;
-  color: #1a2980;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.nav:hover:not(:disabled) {
-  background: white;
-  transform: scale(1.1);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-}
-
-.nav:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
-.nav:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* CONTADOR DE PÁGINAS */
-#pageCounter {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 16px;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 152, 0, 0.9);
   color: white;
-  background: rgba(0,0,0,0.3);
-  padding: 12px 30px;
-  border-radius: 25px;
-  font-weight: 500;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.1);
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+  backdrop-filter: blur(5px);
+}
+
+/* Ajustes para imagens em páginas duplas no mobile */
+.page.single.double-page-mobile img {
+  object-fit: contain;
+  background: #f5f5f5;
+}
+
+/* Tooltip para pontos de navegação */
+.page-dot[title] {
+  position: relative;
+}
+
+.page-dot[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
   z-index: 100;
+  margin-bottom: 5px;
 }
 
-/* PONTINHOS PARA MOBILE */
-.page-dots {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 15px;
-  flex-wrap: wrap;
-  max-width: 90vw;
-  padding: 10px;
-}
-
-.page-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-
-.page-dot:hover {
-  transform: scale(1.2);
-}
-
-.page-dot.active {
-  background: white;
-  transform: scale(1.2);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-/* BOTÃO DE ALTERNÂNCIA MODO VIEW */
-.toggle-view {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  z-index: 1000;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.toggle-view:hover {
-  background: white;
-  transform: scale(1.1);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-}
-
-.toggle-view .desktop-icon {
-  display: none;
-}
-
-@media (min-width: 769px) {
-  .toggle-view .mobile-icon {
-    display: none;
-  }
-  
-  .toggle-view .desktop-icon {
-    display: inline;
-  }
-}
-
-/* ANIMAÇÕES PARA MOBILE */
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.page.single.slide-right {
-  animation: slideInRight 0.3s ease-out;
-}
-
-.page.single.slide-left {
-  animation: slideInLeft 0.3s ease-out;
-}
-
-/* MODO RETRATO (vertical muito estreito) */
-@media (max-height: 500px) and (orientation: portrait) {
-  .stage {
-    height: 80vh;
-  }
-  
-  .book {
-    height: 65vh;
-  }
-  
-  #pageCounter {
-    font-size: 14px;
-    padding: 8px 20px;
-    margin-top: 10px;
-  }
-}
-
-/* MODO PAISAGEM EM MOBILE */
-@media (max-width: 768px) and (orientation: landscape) {
-  .book {
-    width: 85vw;
-    height: 80vh;
-  }
-  
-  .stage {
-    height: 85vh;
-  }
-  
-  .nav {
-    width: 45px !important;
-    height: 45px !important;
-    font-size: 24px !important;
-  }
-}
-
-/* MELHORIAS PARA TOUCH */
-@media (pointer: coarse) {
-  .nav {
-    min-width: 44px;
-    min-height: 44px;
-  }
-  
-  .page-dot {
-    min-width: 16px;
-    min-height: 16px;
-  }
-  
-  button {
-    cursor: pointer;
-  }
-}
-
-/* INDICADOR DE SWIPE */
+/* Indicador de swipe melhorado para mobile */
 .swipe-indicator {
   position: fixed;
   bottom: 70px;
@@ -415,21 +56,52 @@ body {
   transform: translateX(-50%);
   color: white;
   font-size: 12px;
-  background: rgba(0,0,0,0.3);
-  padding: 5px 15px;
-  border-radius: 15px;
-  opacity: 0.8;
+  background: rgba(0,0,0,0.5);
+  padding: 8px 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
   animation: pulse 2s infinite;
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swipe-indicator::before {
+  content: "↔️";
+  font-size: 16px;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.8; }
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
-@media (max-width: 768px) {
+/* Ajustes para telas muito pequenas */
+@media (max-width: 480px) {
+  .page.single.double-page-mobile::before {
+    font-size: 10px;
+    padding: 3px 8px;
+    top: 5px;
+    right: 5px;
+  }
+  
   .swipe-indicator {
-    display: block;
+    font-size: 10px;
+    padding: 6px 15px;
+    bottom: 60px;
+  }
+}
+
+/* Ajustes para modo paisagem no mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .page.single.double-page-mobile::before {
+    top: 5px;
+    right: 5px;
+    font-size: 10px;
+  }
+  
+  .book {
+    height: 85vh;
   }
 }
