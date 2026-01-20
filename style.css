@@ -2,6 +2,7 @@
   box-sizing: border-box;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 body {
@@ -13,11 +14,10 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  overflow-x: hidden;
   padding: 10px;
+  overflow-x: hidden;
 }
 
-/* STAGE - Container principal */
 .stage {
   display: flex;
   align-items: center;
@@ -29,7 +29,6 @@ body {
   padding: 10px;
 }
 
-/* BOOK - Container do álbum */
 .book {
   position: relative;
   width: min(95vw, 1200px);
@@ -42,7 +41,6 @@ body {
     inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
-/* PÁGINAS */
 .page {
   position: absolute;
   width: 50%;
@@ -82,7 +80,6 @@ body {
   border-radius: 0 8px 8px 0;
 }
 
-/* IMAGENS - Mantendo proporção */
 .page img {
   width: 100%;
   height: 100%;
@@ -90,7 +87,6 @@ body {
   display: block;
 }
 
-/* BOTÕES DE NAVEGAÇÃO - Otimizados para toque */
 .nav {
   width: min(60px, 12vw);
   height: min(60px, 12vw);
@@ -126,7 +122,6 @@ body {
   transform: none;
 }
 
-/* CONTADOR DE PÁGINAS */
 #pageCounter {
   margin-top: 20px;
   text-align: center;
@@ -232,6 +227,13 @@ body {
   .stage {
     height: 90vh;
   }
+  
+  #pageCounter {
+    position: fixed;
+    bottom: 10px;
+    margin-top: 0;
+    font-size: 12px;
+  }
 }
 
 /* Telas muito altas */
@@ -239,24 +241,6 @@ body {
   .book {
     height: 75vh;
     max-height: 800px;
-  }
-}
-
-/* Animações suaves para transições de tamanho */
-.book, .page, .nav {
-  transition: all 0.3s ease;
-}
-
-/* Melhorias para toque em dispositivos móveis */
-@media (hover: none) and (pointer: coarse) {
-  .nav {
-    min-width: 44px;
-    min-height: 44px;
-  }
-  
-  /* Efeito de toque nos botões */
-  .nav:active {
-    transform: scale(0.9);
   }
 }
 
@@ -286,7 +270,7 @@ body {
 @media (max-width: 768px) {
   .swipe-hint {
     display: block;
-    position: absolute;
+    position: fixed;
     bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
@@ -296,10 +280,26 @@ body {
     padding: 6px 12px;
     border-radius: 15px;
     animation: pulse 2s infinite;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+    pointer-events: none;
   }
   
   @keyframes pulse {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 0.8; }
+  }
+}
+
+/* Melhorias para toque */
+@media (hover: none) and (pointer: coarse) {
+  .nav {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .nav:active {
+    transform: scale(0.9);
   }
 }
