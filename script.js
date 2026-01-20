@@ -16,12 +16,22 @@ const btnPrev = document.querySelector('.nav.prev');
 const pageDots = document.getElementById('pageDots');
 const toggleView = document.getElementById('toggleView');
 
-// Verificar se é mobile
+// Detectar se é mobile
 function checkMobileView() {
   const wasMobile = isMobileView;
   isMobileView = window.innerWidth <= 768;
   
   if (wasMobile !== isMobileView) {
+    // Se mudou de desktop para mobile ou vice-versa, ajustar current
+    if (isMobileView) {
+      // No mobile, cada item do array é uma página única
+      // Mantemos o mesmo índice, pois agora cada página é independente
+    } else {
+      // No desktop, voltamos para índice par (para mostrar duas páginas)
+      if (current % 2 !== 0) {
+        current = Math.max(0, current - 1);
+      }
+    }
     render();
     updateButtons();
     updatePageDots();
@@ -46,7 +56,15 @@ function render() {
     singleImg.src = page?.image || '';
     singleImg.style.opacity = '1';
     
-    // Esconder páginas duplas
+    // Verificar se é parte de página dupla e mostrar alerta visual
+    if (page?.image && (page.image.includes('_esq') || page.image.includes('_dir'))) {
+      // Página dupla - mostrar como única
+      singlePage.classList.add('double-page-mobile');
+    } else {
+      singlePage.classList.remove('double-page-mobile');
+    }
+    
+    // Esconder páginas duplas (desktop view)
     leftImg.style.display = 'none';
     rightImg.style.display = 'none';
     flipPage.style.display = 'none';
@@ -54,8 +72,9 @@ function render() {
     // Mostrar página única
     singlePage.style.display = 'flex';
   } else {
-    // MODO DESKTOP - Duas páginas
+    // MODO DESKTOP - Duas páginas lado a lado
     singlePage.style.display = 'none';
+    singlePage.classList.remove('double-page-mobile');
     
     // Mostrar página esquerda
     leftImg.src = pages[current]?.image || '';
@@ -81,8 +100,17 @@ function updateCounter() {
   const total = pages.length;
   
   if (isMobileView) {
-    counter.textContent = `Página ${current + 1} de ${total}`;
+    // No mobile: mostrar página atual/total
+    const currentPage = current + 1;
+    counter.textContent = `Página ${currentPage} de ${total}`;
+    
+    // Adicionar indicador se for parte de página dupla
+    const page = pages[current];
+    if (page?.image && (page.image.includes('_esq') || page.image.includes('_dir'))) {
+      counter.textContent += " (Página Dupla)";
+    }
   } else {
+    // No desktop: mostrar par de páginas
     const currentPage = Math.floor(current / 2) + 1;
     const totalPages = Math.ceil(total / 2);
     
@@ -122,7 +150,17 @@ function updatePageDots() {
   let dotsHTML = '';
   for (let i = 0; i < pages.length; i++) {
     const activeClass = i === current ? 'active' : '';
-    dotsHTML += `<div class="page-dot ${activeClass}" data-index="${i}"></div>`;
+    const page = pages[i];
+    let tooltip = '';
+    
+    // Adicionar tooltip para páginas duplas
+    if (page.image.includes('_esq')) {
+      tooltip = 'title="Parte esquerda da página dupla"';
+    } else if (page.image.includes('_dir')) {
+      tooltip = 'title="Parte direita da página dupla"';
+    }
+    
+    dotsHTML += `<div class="page-dot ${activeClass}" data-index="${i}" ${tooltip}></div>`;
   }
   
   pageDots.innerHTML = dotsHTML;
@@ -303,7 +341,7 @@ document.addEventListener('touchend', (e) => {
 // Alternar visualização (mobile/desktop)
 toggleView.addEventListener('click', () => {
   if (isMobileView) {
-    // Forçar modo desktop
+    // Forçar modo desktop - ajustar para índice par
     if (current % 2 !== 0) {
       current = Math.max(0, current - 1);
     }
