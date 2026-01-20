@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Álbum Virtual</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1a2980">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,12 +15,6 @@
   <button class="nav prev" aria-label="Página anterior">‹</button>
 
   <div class="book" id="book">
-    <!-- Container para página única (mobile) -->
-    <div class="page single" id="singlePage">
-      <img id="singleImg">
-    </div>
-    
-    <!-- Container para páginas duplas (desktop) -->
     <div class="page left">
       <img id="leftImg">
     </div>
@@ -28,7 +23,6 @@
       <img id="rightImg">
     </div>
     
-    <!-- Página que será animada para o flip -->
     <div class="page flip-page" id="flipPage">
       <img id="flipImg">
     </div>
@@ -38,15 +32,6 @@
 </div>
 
 <div id="pageCounter"></div>
-
-<!-- Índice de páginas para mobile -->
-<div id="pageDots" class="page-dots"></div>
-
-<!-- Botão de alternância modo mobile/desktop -->
-<button id="toggleView" class="toggle-view" title="Alternar visualização">
-  <span class="mobile-icon">📱</span>
-  <span class="desktop-icon">💻</span>
-</button>
 
 <script src="script.js"></script>
 </body>
