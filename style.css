@@ -1,107 +1,305 @@
-/* Adicione estas regras ao seu CSS existente */
-
-/* Estilo especial para páginas duplas no mobile */
-.page.single.double-page-mobile {
-  border: 2px solid #ff9800;
-  position: relative;
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.page.single.double-page-mobile::before {
-  content: "🖼️ Página Dupla";
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 152, 0, 0.9);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 12px;
-  font-weight: bold;
-  z-index: 10;
-  backdrop-filter: blur(5px);
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #1a2980, #26d0ce);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding: 10px;
 }
 
-/* Ajustes para imagens em páginas duplas no mobile */
-.page.single.double-page-mobile img {
-  object-fit: contain;
-  background: #f5f5f5;
-}
-
-/* Tooltip para pontos de navegação */
-.page-dot[title] {
-  position: relative;
-}
-
-.page-dot[title]:hover::after {
-  content: attr(title);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  white-space: nowrap;
-  z-index: 100;
-  margin-bottom: 5px;
-}
-
-/* Indicador de swipe melhorado para mobile */
-.swipe-indicator {
-  position: fixed;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-size: 12px;
-  background: rgba(0,0,0,0.5);
-  padding: 8px 20px;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.2);
-  animation: pulse 2s infinite;
+/* STAGE - Container principal */
+.stage {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 20px;
+  padding: 10px;
 }
 
-.swipe-indicator::before {
-  content: "↔️";
-  font-size: 16px;
+/* BOOK - Container do álbum */
+.book {
+  position: relative;
+  width: min(95vw, 1200px);
+  height: min(85vh, 700px);
+  perspective: 1500px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 
+    0 25px 50px rgba(0,0,0,0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+/* PÁGINAS */
+.page {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  background: white;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
-/* Ajustes para telas muito pequenas */
-@media (max-width: 480px) {
-  .page.single.double-page-mobile::before {
-    font-size: 10px;
-    padding: 3px 8px;
-    top: 5px;
-    right: 5px;
-  }
-  
-  .swipe-indicator {
-    font-size: 10px;
-    padding: 6px 15px;
-    bottom: 60px;
-  }
+.page.left {
+  left: 0;
+  border-radius: 8px 0 0 8px;
+  box-shadow: 
+    -10px 0 25px rgba(0,0,0,0.15),
+    inset 1px 0 0 rgba(0,0,0,0.05);
 }
 
-/* Ajustes para modo paisagem no mobile */
-@media (max-width: 768px) and (orientation: landscape) {
-  .page.single.double-page-mobile::before {
-    top: 5px;
-    right: 5px;
-    font-size: 10px;
+.page.right {
+  right: 0;
+  transform-origin: left center;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 
+    5px 0 15px rgba(0,0,0,0.1),
+    inset -1px 0 0 rgba(0,0,0,0.05);
+}
+
+.page.flip-page {
+  right: 0;
+  transform-origin: left center;
+  z-index: 10;
+  display: none;
+  background: white;
+  border-radius: 0 8px 8px 0;
+}
+
+/* IMAGENS - Mantendo proporção */
+.page img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* BOTÕES DE NAVEGAÇÃO - Otimizados para toque */
+.nav {
+  width: min(60px, 12vw);
+  height: min(60px, 12vw);
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  font-size: min(36px, 7vw);
+  cursor: pointer;
+  color: #1a2980;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.nav:hover:not(:disabled) {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+.nav:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* CONTADOR DE PÁGINAS */
+#pageCounter {
+  margin-top: 20px;
+  text-align: center;
+  font-size: clamp(14px, 3vw, 18px);
+  color: white;
+  background: rgba(0,0,0,0.25);
+  padding: 12px clamp(20px, 5vw, 30px);
+  border-radius: 25px;
+  font-weight: 500;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.1);
+  max-width: 90%;
+  word-wrap: break-word;
+}
+
+/* RESPONSIVIDADE AVANÇADA */
+
+/* Tablets e celulares grandes (768px ou menos) */
+@media (max-width: 768px) {
+  .stage {
+    gap: 10px;
+    padding: 5px;
   }
   
   .book {
+    width: 98vw;
+    height: min(80vh, 500px);
+    perspective: 1000px;
+  }
+  
+  .nav {
+    width: 50px;
+    height: 50px;
+    font-size: 30px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+  }
+}
+
+/* Celulares pequenos (480px ou menos) */
+@media (max-width: 480px) {
+  body {
+    padding: 5px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+  
+  .stage {
+    gap: 8px;
+  }
+  
+  .book {
+    height: 65vh;
+    max-height: 450px;
+    width: 100%;
+    border-radius: 6px;
+  }
+  
+  .page {
+    border-radius: 6px !important;
+  }
+  
+  .page.left {
+    border-radius: 6px 0 0 6px !important;
+  }
+  
+  .page.right {
+    border-radius: 0 6px 6px 0 !important;
+  }
+  
+  .nav {
+    width: 44px;
+    height: 44px;
+    font-size: 26px;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .nav.prev {
+    left: 5px;
+  }
+  
+  .nav.next {
+    right: 5px;
+  }
+  
+  #pageCounter {
+    font-size: 13px;
+    padding: 10px 15px;
+    margin-top: 15px;
+  }
+}
+
+/* Modo paisagem em mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .book {
     height: 85vh;
+    max-height: none;
+  }
+  
+  .stage {
+    height: 90vh;
+  }
+}
+
+/* Telas muito altas */
+@media (min-height: 800px) and (min-width: 1024px) {
+  .book {
+    height: 75vh;
+    max-height: 800px;
+  }
+}
+
+/* Animações suaves para transições de tamanho */
+.book, .page, .nav {
+  transition: all 0.3s ease;
+}
+
+/* Melhorias para toque em dispositivos móveis */
+@media (hover: none) and (pointer: coarse) {
+  .nav {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Efeito de toque nos botões */
+  .nav:active {
+    transform: scale(0.9);
+  }
+}
+
+/* Ajustes para telas muito estreitas */
+@media (max-width: 350px) {
+  .book {
+    height: 60vh;
+  }
+  
+  .nav {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+  
+  #pageCounter {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+/* Indicador de swipe para mobile */
+.swipe-hint {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .swipe-hint {
+    display: block;
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px 12px;
+    border-radius: 15px;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
   }
 }
