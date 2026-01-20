@@ -1,44 +1,35 @@
 * {
   box-sizing: border-box;
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
 }
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, #1a2980, #26d0ce);
+  background: #2c3e50;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 10px;
-  overflow-x: hidden;
 }
 
 .stage {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 40px;
+  padding: 20px;
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  gap: 20px;
-  padding: 10px;
 }
 
 .book {
   position: relative;
-  width: min(95vw, 1200px);
-  height: min(85vh, 700px);
-  perspective: 1500px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  box-shadow: 
-    0 25px 50px rgba(0,0,0,0.25),
-    inset 0 0 0 1px rgba(255,255,255,0.1);
+  width: min(90vw, 1200px);
+  height: min(80vh, 700px);
+  perspective: 2000px;
+  background: transparent;
 }
 
 .page {
@@ -52,23 +43,23 @@ body {
   justify-content: center;
   backface-visibility: hidden;
   transform-style: preserve-3d;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 
+    0 10px 20px rgba(0,0,0,0.1),
+    inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
 .page.left {
   left: 0;
-  border-radius: 8px 0 0 8px;
+  border-radius: 4px 0 0 4px;
   box-shadow: 
-    -10px 0 25px rgba(0,0,0,0.15),
+    -5px 0 15px rgba(0,0,0,0.1),
     inset 1px 0 0 rgba(0,0,0,0.05);
 }
 
 .page.right {
   right: 0;
   transform-origin: left center;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 
-    5px 0 15px rgba(0,0,0,0.1),
-    inset -1px 0 0 rgba(0,0,0,0.05);
 }
 
 .page.flip-page {
@@ -76,28 +67,29 @@ body {
   transform-origin: left center;
   z-index: 10;
   display: none;
-  background: white;
-  border-radius: 0 8px 8px 0;
+  background: linear-gradient(to right, #f9f9f9, #fff);
 }
 
+/* CORREÇÃO AQUI: Mudar object-fit: cover para contain */
 .page img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* Alterado de cover para contain */
   display: block;
+  background: white; /* Fundo branco para áreas vazias */
 }
 
+/* BOTÕES */
 .nav {
-  width: min(60px, 12vw);
-  height: min(60px, 12vw);
-  min-width: 44px;
-  min-height: 44px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255,255,255,0.95);
   border: none;
-  font-size: min(36px, 7vw);
+  font-size: 36px;
+  font-weight: 300;
   cursor: pointer;
-  color: #1a2980;
+  color: #2c3e50;
   box-shadow: 0 8px 25px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
   display: flex;
@@ -106,14 +98,14 @@ body {
   z-index: 100;
 }
 
-.nav:hover:not(:disabled) {
+.nav:hover {
   background: white;
-  transform: scale(1.1);
+  transform: scale(1.05);
   box-shadow: 0 12px 30px rgba(0,0,0,0.3);
 }
 
-.nav:active:not(:disabled) {
-  transform: scale(0.95);
+.nav:active {
+  transform: scale(0.98);
 }
 
 .nav:disabled {
@@ -123,183 +115,37 @@ body {
 }
 
 #pageCounter {
-  margin-top: 20px;
+  margin-top: 25px;
   text-align: center;
-  font-size: clamp(14px, 3vw, 18px);
+  font-size: 14px;
   color: white;
-  background: rgba(0,0,0,0.25);
-  padding: 12px clamp(20px, 5vw, 30px);
-  border-radius: 25px;
+  letter-spacing: 1px;
+  background: rgba(0,0,0,0.2);
+  padding: 8px 20px;
+  border-radius: 20px;
   font-weight: 500;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255,255,255,0.1);
-  max-width: 90%;
-  word-wrap: break-word;
 }
 
-/* RESPONSIVIDADE AVANÇADA */
-
-/* Tablets e celulares grandes (768px ou menos) */
+/* RESPONSIVIDADE SIMPLES */
 @media (max-width: 768px) {
   .stage {
-    gap: 10px;
-    padding: 5px;
-  }
-  
-  .book {
-    width: 98vw;
-    height: min(80vh, 500px);
-    perspective: 1000px;
+    gap: 20px;
   }
   
   .nav {
     width: 50px;
     height: 50px;
     font-size: 30px;
-    position: relative;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-  }
-}
-
-/* Celulares pequenos (480px ou menos) */
-@media (max-width: 480px) {
-  body {
-    padding: 5px;
-    justify-content: flex-start;
-    padding-top: 40px;
-  }
-  
-  .stage {
-    gap: 8px;
   }
   
   .book {
-    height: 65vh;
-    max-height: 450px;
-    width: 100%;
-    border-radius: 6px;
-  }
-  
-  .page {
-    border-radius: 6px !important;
-  }
-  
-  .page.left {
-    border-radius: 6px 0 0 6px !important;
-  }
-  
-  .page.right {
-    border-radius: 0 6px 6px 0 !important;
-  }
-  
-  .nav {
-    width: 44px;
-    height: 44px;
-    font-size: 26px;
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  
-  .nav.prev {
-    left: 5px;
-  }
-  
-  .nav.next {
-    right: 5px;
-  }
-  
-  #pageCounter {
-    font-size: 13px;
-    padding: 10px 15px;
-    margin-top: 15px;
+    height: min(70vh, 500px);
   }
 }
 
-/* Modo paisagem em mobile */
+/* Ajuste para mobile em orientação paisagem */
 @media (max-width: 768px) and (orientation: landscape) {
   .book {
     height: 85vh;
-    max-height: none;
-  }
-  
-  .stage {
-    height: 90vh;
-  }
-  
-  #pageCounter {
-    position: fixed;
-    bottom: 10px;
-    margin-top: 0;
-    font-size: 12px;
-  }
-}
-
-/* Telas muito altas */
-@media (min-height: 800px) and (min-width: 1024px) {
-  .book {
-    height: 75vh;
-    max-height: 800px;
-  }
-}
-
-/* Ajustes para telas muito estreitas */
-@media (max-width: 350px) {
-  .book {
-    height: 60vh;
-  }
-  
-  .nav {
-    width: 40px;
-    height: 40px;
-    font-size: 24px;
-  }
-  
-  #pageCounter {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-}
-
-/* Indicador de swipe para mobile */
-.swipe-hint {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .swipe-hint {
-    display: block;
-    position: fixed;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 12px;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 6px 12px;
-    border-radius: 15px;
-    animation: pulse 2s infinite;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.1);
-    pointer-events: none;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 0.8; }
-  }
-}
-
-/* Melhorias para toque */
-@media (hover: none) and (pointer: coarse) {
-  .nav {
-    min-width: 44px;
-    min-height: 44px;
-  }
-  
-  .nav:active {
-    transform: scale(0.9);
   }
 }
