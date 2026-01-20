@@ -1,7 +1,7 @@
 let pages = [];
 let current = 0;
 let isAnimating = false;
-let isCoverMode = true; // Começa com capa única
+let isCoverMode = true;
 
 // Elementos DOM
 const coverPage = document.getElementById('coverPage');
@@ -13,6 +13,26 @@ const flipPage = document.getElementById('flipPage');
 const counter = document.getElementById('pageCounter');
 const btnNext = document.querySelector('.nav.next');
 const btnPrev = document.querySelector('.nav.prev');
+
+// Função para verificar se um par de páginas é duplo
+function isDoublePagePair(pageIndex) {
+  // Lógica: páginas 7-8, 15-16, 23-24, 31-32, 39-40, 47-48 são duplas
+  // pageIndex começa em 1 (página 1) após a capa
+  
+  // Converter para número da página real (1-indexed)
+  const pageNumber = pageIndex + 1;
+  
+  // Verificar se está na sequência: 7-8, 15-16, 23-24, etc.
+  // Padrão: 7 + 8n até 8 + 8n (n = 0,1,2,3,4,5)
+  for (let n = 0; n <= 5; n++) {
+    const startPage = 7 + (8 * n);
+    const endPage = 8 + (8 * n);
+    if (pageNumber >= startPage && pageNumber <= endPage) {
+      return true;
+    }
+  }
+  return false;
+}
 
 // Carregar páginas do JSON
 fetch('album.json', { cache: 'no-store' })
@@ -26,7 +46,7 @@ fetch('album.json', { cache: 'no-store' })
 // Renderizar página atual
 function render() {
   if (isCoverMode) {
-    // MODO CAPA: Mostrar apenas a capa centralizada
+    // MODO CAPA
     coverPage.style.display = 'flex';
     leftImg.parentElement.style.display = 'none';
     rightImg.parentElement.style.display = 'none';
@@ -34,7 +54,6 @@ function render() {
     coverImg.src = pages[0]?.image || '';
     coverImg.style.opacity = '1';
     
-    // Atualizar contador para capa
     counter.textContent = 'Capa';
   } else {
     // MODO PÁGINAS DUPLAS
@@ -46,37 +65,59 @@ function render() {
     const leftIndex = 1 + (current * 2);
     const rightIndex = leftIndex + 1;
     
-    leftImg.src = pages[leftIndex]?.image || '';
-    leftImg.style.opacity = '1';
+    // Verificar se é uma página dupla
+    const isDoublePage = isDoublePagePair(current * 2);
     
-    if (pages[rightIndex]) {
-      rightImg.src = pages[rightIndex].image;
-      rightImg.style.opacity = '1';
-      rightImg.style.display = 'block';
+    if (isDoublePage) {
+      // PÁGINA DUPLA: usar nomes específicos
+      const pageNumber = current * 2 + 1; // 1-indexed
+      const baseName = `pagina${String(pageNumber).padStart(2, '0')}`;
+      
+      leftImg.src = `${baseName}_esq.jpg` || '';
+      rightImg.src = `${baseName}_dir.jpg` || '';
     } else {
-      rightImg.style.display = 'none';
+      // PÁGINA SIMPLES: nomes padrão
+      leftImg.src = pages[leftIndex]?.image || '';
+      if (pages[rightIndex]) {
+        rightImg.src = pages[rightIndex].image || '';
+        rightImg.style.display = 'block';
+      } else {
+        rightImg.style.display = 'none';
+      }
     }
     
-    // Atualizar contador para páginas duplas
-    const totalDoublePages = Math.ceil((pages.length - 1) / 2);
-    counter.textContent = `Páginas ${current + 1}-${current + 2} de ${totalDoublePages * 2}`;
+    leftImg.style.opacity = '1';
+    rightImg.style.opacity = '1';
+    
+    // Atualizar contador
+    updateCounter();
   }
 }
 
-// Atualizar estado dos botões
+// Atualizar contador
+function updateCounter() {
+  if (!isCoverMode) {
+    const totalPages = Math.floor((pages.length - 1) / 2) * 2; // Total de páginas internas (pares)
+    const currentPageStart = (current * 2) + 1;
+    const currentPageEnd = currentPageStart + 1;
+    const isDoublePage = isDoublePagePair(current * 2);
+    
+    let counterText = `Páginas ${currentPageStart}-${currentPageEnd}`;
+    if (isDoublePage) {
+      counterText += " (Página Dupla)";
+    }
+    counter.textContent = counterText;
+  }
+}
+
+// Atualizar botões
 function updateButtons() {
   if (isCoverMode) {
-    // Na capa: botão anterior desabilitado, próximo habilitado
     btnPrev.disabled = true;
     btnNext.disabled = false;
   } else {
-    // Nas páginas duplas
-    const totalDoublePages = Math.ceil((pages.length - 1) / 2);
-    
-    // Botão anterior: habilitado se não estiver na primeira página dupla
+    const totalDoublePages = Math.floor((pages.length - 1) / 2);
     btnPrev.disabled = current <= 0 || isAnimating;
-    
-    // Botão próximo: habilitado se não estiver na última página dupla
     btnNext.disabled = current >= totalDoublePages - 1 || isAnimating;
   }
 }
@@ -86,12 +127,11 @@ function nextPage() {
   if (isAnimating) return;
   
   if (isCoverMode) {
-    // Transição da capa para a primeira página dupla
+    // Da capa para primeira página dupla
     isCoverMode = false;
     current = 0;
     isAnimating = true;
     
-    // Animação de transição
     coverPage.style.transition = 'opacity 0.5s ease';
     coverPage.style.opacity = '0';
     
@@ -103,7 +143,6 @@ function nextPage() {
       updateButtons();
     }, 500);
   } else {
-    // Páginas duplas: animação de flip
     flipToNextDoublePage();
   }
 }
@@ -113,11 +152,10 @@ function prevPage() {
   if (isAnimating) return;
   
   if (current === 0 && !isCoverMode) {
-    // Voltar da primeira página dupla para a capa
+    // Da primeira página dupla para capa
     isCoverMode = true;
     isAnimating = true;
     
-    // Animação de transição
     leftImg.parentElement.style.transition = 'opacity 0.5s ease';
     rightImg.parentElement.style.transition = 'opacity 0.5s ease';
     leftImg.parentElement.style.opacity = '0';
@@ -133,21 +171,30 @@ function prevPage() {
       updateButtons();
     }, 500);
   } else if (!isCoverMode && current > 0) {
-    // Páginas duplas: animação de flip reverso
     flipToPrevDoublePage();
   }
 }
 
-// Flip para próxima página dupla
+// Flip para próxima página
 function flipToNextDoublePage() {
-  const totalDoublePages = Math.ceil((pages.length - 1) / 2);
+  const totalDoublePages = Math.floor((pages.length - 1) / 2);
   if (current >= totalDoublePages - 1) return;
   
   isAnimating = true;
   updateButtons();
   
-  const rightIndex = 2 + (current * 2);
-  flipImg.src = pages[rightIndex]?.image || '';
+  const isDoublePage = isDoublePagePair(current * 2 + 2);
+  const nextPageNumber = current * 2 + 3;
+  const baseName = `pagina${String(nextPageNumber).padStart(2, '0')}`;
+  
+  // Preparar imagem para flip
+  if (isDoublePage) {
+    flipImg.src = `${baseName}_esq.jpg`;
+  } else {
+    const rightIndex = 2 + (current * 2);
+    flipImg.src = pages[rightIndex]?.image || '';
+  }
+  
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(0deg)';
   rightImg.style.opacity = '0';
@@ -168,7 +215,7 @@ function flipToNextDoublePage() {
   }, 1050);
 }
 
-// Flip para página dupla anterior
+// Flip para página anterior
 function flipToPrevDoublePage() {
   if (current <= 0) return;
   
@@ -177,8 +224,18 @@ function flipToPrevDoublePage() {
   
   current--;
   
-  const rightIndex = 2 + (current * 2);
-  flipImg.src = pages[rightIndex]?.image || '';
+  const isDoublePage = isDoublePagePair(current * 2 + 2);
+  const nextPageNumber = current * 2 + 3;
+  const baseName = `pagina${String(nextPageNumber).padStart(2, '0')}`;
+  
+  // Preparar imagem para flip
+  if (isDoublePage) {
+    flipImg.src = `${baseName}_esq.jpg`;
+  } else {
+    const rightIndex = 2 + (current * 2);
+    flipImg.src = pages[rightIndex]?.image || '';
+  }
+  
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(-180deg)';
   leftImg.style.opacity = '0.5';
@@ -203,98 +260,33 @@ function flipToPrevDoublePage() {
 btnNext.addEventListener('click', nextPage);
 btnPrev.addEventListener('click', prevPage);
 
-// Navegação por teclado
+// Teclado
 document.addEventListener('keydown', (e) => {
   if (isAnimating) return;
-  
-  if (e.key === 'ArrowRight' || e.key === ' ') {
-    nextPage();
-  } else if (e.key === 'ArrowLeft') {
-    prevPage();
-  }
+  if (e.key === 'ArrowRight' || e.key === ' ') nextPage();
+  else if (e.key === 'ArrowLeft') prevPage();
 });
 
-// Swipe para mobile
+// Swipe
 let touchStartX = 0;
-let touchEndX = 0;
-let touchStartY = 0;
-
 document.addEventListener('touchstart', (e) => {
   touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
 });
 
 document.addEventListener('touchend', (e) => {
   if (isAnimating) return;
-  
-  touchEndX = e.changedTouches[0].clientX;
-  const touchEndY = e.changedTouches[0].clientY;
-  
+  const touchEndX = e.changedTouches[0].clientX;
   const deltaX = touchEndX - touchStartX;
-  const deltaY = touchEndY - touchStartY;
-  
-  // Ignorar swipes verticais
-  if (Math.abs(deltaY) > Math.abs(deltaX)) return;
-  
-  // Limiar para swipe
   const threshold = Math.min(window.innerWidth * 0.1, 50);
-  
   if (Math.abs(deltaX) > threshold) {
-    if (deltaX > 0) {
-      // Swipe para direita: página anterior
-      prevPage();
-    } else {
-      // Swipe para esquerda: próxima página
-      nextPage();
-    }
+    if (deltaX > 0) prevPage();
+    else nextPage();
   }
 });
-
-// Prevenir zoom com dois dedos
-document.addEventListener('gesturestart', (e) => {
-  e.preventDefault();
-});
-
-// Ajustar ao redimensionar a janela
-window.addEventListener('resize', () => {
-  updateButtons();
-});
-
-// Verificar imagens
-function checkImages() {
-  pages.forEach(page => {
-    const img = new Image();
-    img.onerror = function() {
-      console.warn(`Imagem não encontrada: ${page.image}`);
-    };
-    img.src = page.image;
-  });
-}
 
 // Inicializar
 fetch('album.json')
   .then(r => r.json())
   .then(data => {
     pages = data;
-    checkImages();
   });
-
-// Função para debug
-window.debugAlbum = {
-  goToPage: (page) => {
-    if (page === 0) {
-      isCoverMode = true;
-      current = 0;
-    } else {
-      isCoverMode = false;
-      current = Math.floor((page - 1) / 2);
-    }
-    render();
-    updateButtons();
-  },
-  currentState: () => ({
-    isCoverMode,
-    current,
-    totalPages: pages.length
-  })
-};
