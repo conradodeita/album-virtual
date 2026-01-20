@@ -1,7 +1,7 @@
 [
   {
     "type": "capa",
-    "image": "Capa.png"
+    "image": "Capa.jpg"
   },
   {
     "type": "pagina",
@@ -9,11 +9,7 @@
   },
   {
     "type": "pagina",
-    "image": "pagina02_esq.jpg"
-  },
-  {
-    "type": "pagina", 
-    "image": "pagina02_dir.jpg"
+    "image": "pagina02.jpg"
   },
   {
     "type": "pagina",
@@ -25,15 +21,19 @@
   },
   {
     "type": "pagina",
-    "image": "pagina05_esq.jpg"
-  },
-  {
-    "type": "pagina",
-    "image": "pagina05_dir.jpg"
+    "image": "pagina05.jpg"
   },
   {
     "type": "pagina",
     "image": "pagina06.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina07.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina08.jpg"
   },
   {
     "type": "contracapa",
