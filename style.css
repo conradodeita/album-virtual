@@ -1,13 +1,14 @@
 * {
   box-sizing: border-box;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
-  background: #2c3e50;
+  background: transparent !important; /* Fundo transparente */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -15,51 +16,52 @@ body {
   min-height: 100vh;
 }
 
+/* Remove qualquer gradiente ou cor do stage */
 .stage {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 40px;
-  padding: 20px;
   width: 100%;
-}
-
-.book {
-  position: relative;
-  width: min(90vw, 1200px);
-  height: min(80vh, 700px);
-  perspective: 2000px;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 20px;
+  padding: 10px;
   background: transparent;
 }
 
+/* Livro com fundo transparente */
+.book {
+  position: relative;
+  width: min(95vw, 1200px);
+  height: min(85vh, 700px);
+  perspective: 1500px;
+  background: transparent !important; /* Transparente */
+  border-radius: 8px;
+}
+
+/* Páginas com fundo transparente */
 .page {
   position: absolute;
   width: 50%;
   height: 100%;
-  background: white;
+  background: transparent !important; /* Transparente */
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   backface-visibility: hidden;
   transform-style: preserve-3d;
-  border-radius: 0 4px 4px 0;
-  box-shadow: 
-    0 10px 20px rgba(0,0,0,0.1),
-    inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
 .page.left {
   left: 0;
-  border-radius: 4px 0 0 4px;
-  box-shadow: 
-    -5px 0 15px rgba(0,0,0,0.1),
-    inset 1px 0 0 rgba(0,0,0,0.05);
+  border-radius: 8px 0 0 8px;
 }
 
 .page.right {
   right: 0;
   transform-origin: left center;
+  border-radius: 0 8px 8px 0;
 }
 
 .page.flip-page {
@@ -67,29 +69,30 @@ body {
   transform-origin: left center;
   z-index: 10;
   display: none;
-  background: linear-gradient(to right, #f9f9f9, #fff);
+  background: transparent !important; /* Transparente */
 }
 
-/* CORREÇÃO AQUI: Mudar object-fit: cover para contain */
+/* Imagens mantêm transparência */
 .page img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Alterado de cover para contain */
+  object-fit: contain;
   display: block;
-  background: white; /* Fundo branco para áreas vazias */
+  background: transparent !important; /* Transparente */
 }
 
-/* BOTÕES */
+/* Botões com transparência reduzida */
 .nav {
-  width: 60px;
-  height: 60px;
+  width: min(60px, 12vw);
+  height: min(60px, 12vw);
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.85); /* Mais transparente */
   border: none;
-  font-size: 36px;
-  font-weight: 300;
+  font-size: min(36px, 7vw);
   cursor: pointer;
-  color: #2c3e50;
+  color: #1a2980;
   box-shadow: 0 8px 25px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
   display: flex;
@@ -98,54 +101,158 @@ body {
   z-index: 100;
 }
 
-.nav:hover {
-  background: white;
-  transform: scale(1.05);
+.nav:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.1);
   box-shadow: 0 12px 30px rgba(0,0,0,0.3);
 }
 
-.nav:active {
-  transform: scale(0.98);
+.nav:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .nav:disabled {
-  opacity: 0.3;
+  opacity: 0.2;
   cursor: not-allowed;
   transform: none;
+  background: rgba(255, 255, 255, 0.5);
 }
 
+/* Contador com transparência */
 #pageCounter {
-  margin-top: 25px;
+  margin-top: 20px;
   text-align: center;
-  font-size: 14px;
-  color: white;
-  letter-spacing: 1px;
-  background: rgba(0,0,0,0.2);
-  padding: 8px 20px;
-  border-radius: 20px;
+  font-size: clamp(14px, 3vw, 18px);
+  color: rgba(0, 0, 0, 0.8); /* Cor escura para contraste */
+  background: rgba(255, 255, 255, 0.7); /* Semi-transparente */
+  padding: 12px clamp(20px, 5vw, 30px);
+  border-radius: 25px;
   font-weight: 500;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  max-width: 90%;
+  word-wrap: break-word;
 }
 
-/* RESPONSIVIDADE SIMPLES */
+/* Remove sombras desnecessárias */
+.page.left, .page.right {
+  box-shadow: none;
+}
+
+/* Efeito de borda sutil para demarcar páginas */
+.page {
+  border: 1px solid rgba(0, 0, 0, 0.1); /* Borda sutil */
+}
+
+.page.left {
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+}
+
+.page.right {
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+}
+
+/* RESPONSIVIDADE */
+
 @media (max-width: 768px) {
   .stage {
-    gap: 20px;
+    gap: 10px;
+    padding: 5px;
+  }
+  
+  .book {
+    width: 98vw;
+    height: min(80vh, 500px);
+    perspective: 1000px;
   }
   
   .nav {
     width: 50px;
     height: 50px;
     font-size: 30px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
   }
   
-  .book {
-    height: min(70vh, 500px);
+  .page {
+    border: 0.5px solid rgba(0, 0, 0, 0.05);
   }
 }
 
-/* Ajuste para mobile em orientação paisagem */
+@media (max-width: 480px) {
+  body {
+    padding: 5px;
+    justify-content: flex-start;
+    padding-top: 40px;
+    background: transparent;
+  }
+  
+  .stage {
+    gap: 8px;
+  }
+  
+  .book {
+    height: 65vh;
+    max-height: 450px;
+    width: 100%;
+    border-radius: 6px;
+  }
+  
+  .page {
+    border-radius: 6px !important;
+    border: 0.5px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .page.left {
+    border-radius: 6px 0 0 6px !important;
+  }
+  
+  .page.right {
+    border-radius: 0 6px 6px 0 !important;
+  }
+  
+  .nav {
+    width: 44px;
+    height: 44px;
+    font-size: 26px;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.85);
+  }
+  
+  .nav.prev {
+    left: 5px;
+  }
+  
+  .nav.next {
+    right: 5px;
+  }
+  
+  #pageCounter {
+    font-size: 13px;
+    padding: 10px 15px;
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Ajuste para orientação paisagem */
 @media (max-width: 768px) and (orientation: landscape) {
   .book {
     height: 85vh;
+    max-height: none;
   }
+  
+  .stage {
+    height: 90vh;
+  }
+}
+
+/* Remove qualquer gradiente residual */
+body::before, .stage::before, .book::before {
+  display: none !important;
 }
