@@ -1,42 +1,14 @@
 let pages = [];
 let current = 0;
 let isAnimating = false;
-let isMobileView = window.innerWidth <= 768;
 
-// Elementos DOM
 const leftImg = document.getElementById('leftImg');
 const rightImg = document.getElementById('rightImg');
-const singleImg = document.getElementById('singleImg');
 const flipImg = document.getElementById('flipImg');
 const flipPage = document.getElementById('flipPage');
-const singlePage = document.getElementById('singlePage');
 const counter = document.getElementById('pageCounter');
 const btnNext = document.querySelector('.nav.next');
 const btnPrev = document.querySelector('.nav.prev');
-const pageDots = document.getElementById('pageDots');
-const toggleView = document.getElementById('toggleView');
-
-// Detectar se é mobile
-function checkMobileView() {
-  const wasMobile = isMobileView;
-  isMobileView = window.innerWidth <= 768;
-  
-  if (wasMobile !== isMobileView) {
-    // Se mudou de desktop para mobile ou vice-versa, ajustar current
-    if (isMobileView) {
-      // No mobile, cada item do array é uma página única
-      // Mantemos o mesmo índice, pois agora cada página é independente
-    } else {
-      // No desktop, voltamos para índice par (para mostrar duas páginas)
-      if (current % 2 !== 0) {
-        current = Math.max(0, current - 1);
-      }
-    }
-    render();
-    updateButtons();
-    updatePageDots();
-  }
-}
 
 // Carregar páginas do JSON
 fetch('album.json', { cache: 'no-store' })
@@ -45,217 +17,106 @@ fetch('album.json', { cache: 'no-store' })
     pages = data;
     render();
     updateButtons();
-    updatePageDots();
+    
+    // Adicionar hint de swipe em mobile
+    if (window.innerWidth <= 768) {
+      addSwipeHint();
+    }
   });
 
-// Renderizar página atual
 function render() {
-  if (isMobileView) {
-    // MODO MOBILE - Uma página por vez
-    const page = pages[current];
-    singleImg.src = page?.image || '';
-    singleImg.style.opacity = '1';
-    
-    // Verificar se é parte de página dupla e mostrar alerta visual
-    if (page?.image && (page.image.includes('_esq') || page.image.includes('_dir'))) {
-      // Página dupla - mostrar como única
-      singlePage.classList.add('double-page-mobile');
-    } else {
-      singlePage.classList.remove('double-page-mobile');
-    }
-    
-    // Esconder páginas duplas (desktop view)
-    leftImg.style.display = 'none';
-    rightImg.style.display = 'none';
-    flipPage.style.display = 'none';
-    
-    // Mostrar página única
-    singlePage.style.display = 'flex';
+  // Mostrar página esquerda
+  leftImg.src = pages[current]?.image || '';
+  leftImg.style.opacity = '1';
+  
+  // Mostrar página direita (se existir)
+  if (pages[current + 1]) {
+    rightImg.src = pages[current + 1].image;
+    rightImg.style.opacity = '1';
+    rightImg.style.display = 'block';
   } else {
-    // MODO DESKTOP - Duas páginas lado a lado
-    singlePage.style.display = 'none';
-    singlePage.classList.remove('double-page-mobile');
-    
-    // Mostrar página esquerda
-    leftImg.src = pages[current]?.image || '';
-    leftImg.style.opacity = '1';
-    leftImg.style.display = 'block';
-    
-    // Mostrar página direita (se existir)
-    if (pages[current + 1]) {
-      rightImg.src = pages[current + 1].image;
-      rightImg.style.opacity = '1';
-      rightImg.style.display = 'block';
-    } else {
-      rightImg.style.display = 'none';
-    }
+    rightImg.style.display = 'none';
   }
   
   updateCounter();
-  updatePageDots();
 }
 
-// Atualizar contador
 function updateCounter() {
   const total = pages.length;
+  const currentPage = Math.floor(current / 2) + 1;
+  const totalPages = Math.ceil(total / 2);
   
-  if (isMobileView) {
-    // No mobile: mostrar página atual/total
-    const currentPage = current + 1;
-    counter.textContent = `Página ${currentPage} de ${total}`;
-    
-    // Adicionar indicador se for parte de página dupla
-    const page = pages[current];
-    if (page?.image && (page.image.includes('_esq') || page.image.includes('_dir'))) {
-      counter.textContent += " (Página Dupla)";
-    }
-  } else {
-    // No desktop: mostrar par de páginas
-    const currentPage = Math.floor(current / 2) + 1;
-    const totalPages = Math.ceil(total / 2);
-    
-    // Verificar se é uma página dupla
-    const leftPage = pages[current];
-    const rightPage = pages[current + 1];
-    const isDoublePage = leftPage && rightPage && 
-                        (leftPage.image.includes('_esq') && rightPage.image.includes('_dir'));
-    
-    let text = `Página ${currentPage} de ${totalPages}`;
-    if (isDoublePage) {
-      text += " (Página Dupla)";
-    }
-    
-    counter.textContent = text;
+  // Verificar se é uma página dupla
+  const leftPage = pages[current];
+  const rightPage = pages[current + 1];
+  const isDoublePage = leftPage && rightPage && 
+                      (leftPage.image.includes('_esq') && rightPage.image.includes('_dir'));
+  
+  let text = `Página ${currentPage} de ${totalPages}`;
+  if (isDoublePage) {
+    text += " (Página Dupla)";
   }
+  
+  counter.textContent = text;
 }
 
-// Atualizar botões
 function updateButtons() {
-  if (isMobileView) {
-    btnPrev.disabled = current <= 0 || isAnimating;
-    btnNext.disabled = current >= pages.length - 1 || isAnimating;
-  } else {
-    btnPrev.disabled = current <= 0 || isAnimating;
-    btnNext.disabled = current + 2 >= pages.length || isAnimating;
-  }
+  btnPrev.disabled = current <= 0 || isAnimating;
+  btnNext.disabled = current + 2 >= pages.length || isAnimating;
 }
 
-// Atualizar pontos de navegação (mobile)
-function updatePageDots() {
-  if (!isMobileView) {
-    pageDots.innerHTML = '';
-    return;
-  }
-  
-  let dotsHTML = '';
-  for (let i = 0; i < pages.length; i++) {
-    const activeClass = i === current ? 'active' : '';
-    const page = pages[i];
-    let tooltip = '';
-    
-    // Adicionar tooltip para páginas duplas
-    if (page.image.includes('_esq')) {
-      tooltip = 'title="Parte esquerda da página dupla"';
-    } else if (page.image.includes('_dir')) {
-      tooltip = 'title="Parte direita da página dupla"';
-    }
-    
-    dotsHTML += `<div class="page-dot ${activeClass}" data-index="${i}" ${tooltip}></div>`;
-  }
-  
-  pageDots.innerHTML = dotsHTML;
-  
-  // Adicionar event listeners aos pontos
-  document.querySelectorAll('.page-dot').forEach(dot => {
-    dot.addEventListener('click', function() {
-      const index = parseInt(this.getAttribute('data-index'));
-      goToPage(index);
-    });
-  });
-}
-
-// Navegar para página específica
-function goToPage(index) {
-  if (isAnimating || index === current || index < 0 || index >= pages.length) return;
-  
-  const direction = index > current ? 'right' : 'left';
-  current = index;
-  
-  if (isMobileView) {
-    // Animação de slide no mobile
-    isAnimating = true;
-    singlePage.classList.remove('slide-right', 'slide-left');
-    singlePage.classList.add(`slide-${direction}`);
-    
-    setTimeout(() => {
-      render();
-      isAnimating = false;
-      updateButtons();
-    }, 300);
-  } else {
-    // Ajustar para índice par no desktop
-    if (current % 2 !== 0) {
-      current = Math.max(0, current - 1);
-    }
-    render();
-    updateButtons();
-  }
-}
-
-// Próxima página
-function nextPage() {
-  if (isAnimating) return;
-  
-  if (isMobileView) {
-    if (current < pages.length - 1) {
-      goToPage(current + 1);
-    }
-  } else {
-    flipNext();
-  }
-}
-
-// Página anterior
-function prevPage() {
-  if (isAnimating) return;
-  
-  if (isMobileView) {
-    if (current > 0) {
-      goToPage(current - 1);
-    }
-  } else {
-    flipPrev();
-  }
-}
-
-// Flip para desktop (mantido do código original)
 function flipNext() {
   if (isAnimating || current + 2 >= pages.length) return;
   
   isAnimating = true;
   updateButtons();
   
+  // Ajustar duração da animação baseado no dispositivo
+  const isMobile = window.innerWidth <= 768;
+  const flipDuration = isMobile ? 800 : 1200;
+  
+  // Preparar a página que será virada
   flipImg.src = pages[current + 1].image;
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(0deg)';
   rightImg.style.opacity = '0';
   
+  // Animação de flip
   setTimeout(() => {
-    flipPage.style.transition = 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
+    flipPage.style.transition = `transform ${flipDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
     flipPage.style.transform = 'rotateY(-180deg)';
-    flipPage.style.boxShadow = '-30px 0 50px rgba(0,0,0,0.3), inset -5px 0 10px rgba(0,0,0,0.1)';
+    
+    // Sombras durante a animação (mais sutis em mobile)
+    if (isMobile) {
+      flipPage.style.boxShadow = 
+        '-15px 0 30px rgba(0,0,0,0.2), ' +
+        'inset -3px 0 5px rgba(0,0,0,0.1)';
+    } else {
+      flipPage.style.boxShadow = 
+        '-30px 0 50px rgba(0,0,0,0.3), ' +
+        'inset -5px 0 10px rgba(0,0,0,0.1)';
+    }
   }, 50);
   
+  // Após animação, atualizar páginas
   setTimeout(() => {
+    // Avançar para as próximas páginas
     current += 2;
+    
+    // Resetar animação
     flipPage.style.transition = 'none';
     flipPage.style.transform = 'rotateY(0deg)';
     flipPage.style.display = 'none';
     flipPage.style.boxShadow = 'none';
+    
+    // Atualizar display
     render();
     isAnimating = false;
     updateButtons();
-  }, 1250);
+    
+    // Remover hint de swipe após primeira interação
+    removeSwipeHint();
+  }, flipDuration + 50);
 }
 
 function flipPrev() {
@@ -263,50 +124,127 @@ function flipPrev() {
   
   isAnimating = true;
   updateButtons();
+  
+  // Ajustar duração da animação baseado no dispositivo
+  const isMobile = window.innerWidth <= 768;
+  const flipDuration = isMobile ? 800 : 1200;
+  
+  // Voltar para páginas anteriores
   current -= 2;
   
+  // Preparar animação reversa
   flipImg.src = pages[current + 1]?.image || '';
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(-180deg)';
-  flipPage.style.boxShadow = '-30px 0 50px rgba(0,0,0,0.3), inset -5px 0 10px rgba(0,0,0,0.1)';
+  
+  // Sombras (mais sutis em mobile)
+  if (isMobile) {
+    flipPage.style.boxShadow = 
+      '-15px 0 30px rgba(0,0,0,0.2), ' +
+      'inset -3px 0 5px rgba(0,0,0,0.1)';
+  } else {
+    flipPage.style.boxShadow = 
+      '-30px 0 50px rgba(0,0,0,0.3), ' +
+      'inset -5px 0 10px rgba(0,0,0,0.1)';
+  }
+  
+  // Esconder páginas atuais temporariamente
   leftImg.style.opacity = '0.5';
   rightImg.style.opacity = '0';
   
+  // Animação reversa
   setTimeout(() => {
-    flipPage.style.transition = 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
+    flipPage.style.transition = `transform ${flipDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
     flipPage.style.transform = 'rotateY(0deg)';
   }, 50);
   
+  // Após animação, atualizar páginas
   setTimeout(() => {
+    // Resetar animação
     flipPage.style.transition = 'none';
     flipPage.style.transform = 'rotateY(0deg)';
     flipPage.style.display = 'none';
     flipPage.style.boxShadow = 'none';
+    
+    // Atualizar display
     render();
     isAnimating = false;
     updateButtons();
-  }, 1250);
+    
+    // Remover hint de swipe após primeira interação
+    removeSwipeHint();
+  }, flipDuration + 50);
 }
 
-// EVENT LISTENERS
-btnNext.onclick = nextPage;
-btnPrev.onclick = prevPage;
+// Adicionar hint de swipe em mobile
+function addSwipeHint() {
+  const existingHint = document.querySelector('.swipe-hint');
+  if (existingHint) return;
+  
+  const hint = document.createElement('div');
+  hint.className = 'swipe-hint';
+  hint.innerHTML = '← Deslize para navegar →';
+  hint.style.cssText = `
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    animation: pulse 2s infinite;
+    pointer-events: none;
+  `;
+  
+  // Adicionar keyframes para pulse
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(hint);
+  
+  // Auto-remover após 10 segundos ou primeira interação
+  setTimeout(removeSwipeHint, 10000);
+}
+
+function removeSwipeHint() {
+  const hint = document.querySelector('.swipe-hint');
+  if (hint) {
+    hint.style.transition = 'opacity 0.5s';
+    hint.style.opacity = '0';
+    setTimeout(() => hint.remove(), 500);
+  }
+}
+
+// Event listeners
+btnNext.onclick = flipNext;
+btnPrev.onclick = flipPrev;
 
 // Navegação por teclado
 document.addEventListener('keydown', (e) => {
   if (isAnimating) return;
   
   if (e.key === 'ArrowRight' || e.key === ' ') {
-    nextPage();
+    flipNext();
   } else if (e.key === 'ArrowLeft') {
-    prevPage();
+    flipPrev();
   }
 });
 
-// Swipe para mobile
+// Suporte a toque em dispositivos móveis
 let touchStartX = 0;
-let touchStartY = 0;
 let touchEndX = 0;
+let touchStartY = 0;
 let touchEndY = 0;
 
 document.addEventListener('touchstart', (e) => {
@@ -323,66 +261,43 @@ document.addEventListener('touchend', (e) => {
   const deltaX = touchEndX - touchStartX;
   const deltaY = touchEndY - touchStartY;
   
-  // Ignorar swipes verticais
-  if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+  // Ignorar swipes verticais longos (scroll da página)
+  if (Math.abs(deltaY) > 100) return;
   
-  // Limiar para considerar swipe
-  if (Math.abs(deltaX) < 50) return;
+  // Limiar para considerar como swipe (menor em mobile)
+  const threshold = window.innerWidth <= 768 ? 40 : 50;
+  if (Math.abs(deltaX) < threshold) return;
   
   if (deltaX > 0) {
-    // Swipe para direita → página anterior
-    prevPage();
+    // Swipe para direita - página anterior
+    flipPrev();
   } else {
-    // Swipe para esquerda → próxima página
-    nextPage();
+    // Swipe para esquerda - próxima página
+    flipNext();
   }
 });
 
-// Alternar visualização (mobile/desktop)
-toggleView.addEventListener('click', () => {
-  if (isMobileView) {
-    // Forçar modo desktop - ajustar para índice par
-    if (current % 2 !== 0) {
-      current = Math.max(0, current - 1);
-    }
-    isMobileView = false;
-  } else {
-    // Forçar modo mobile
-    isMobileView = true;
-  }
-  
-  render();
-  updateButtons();
-  updatePageDots();
-});
-
-// Redimensionamento da janela
+// Ajustar ao redimensionar a janela
 window.addEventListener('resize', () => {
-  checkMobileView();
+  // Recalcular se necessário
+  updateButtons();
 });
 
-// Verificar imagens
+// Verificar se as imagens existem
 function checkImages() {
   pages.forEach(page => {
     const img = new Image();
-    img.onerror = () => console.warn(`Imagem não encontrada: ${page.image}`);
+    img.onerror = function() {
+      console.warn(`Imagem não encontrada: ${page.image}`);
+    };
     img.src = page.image;
   });
 }
 
-// Inicializar
+// Executar após carregar as páginas
 fetch('album.json')
   .then(r => r.json())
   .then(data => {
     pages = data;
     checkImages();
-    checkMobileView();
   });
-
-// Expor funções para debug
-window.debugAlbum = {
-  goToPage,
-  current: () => current,
-  isMobile: () => isMobileView,
-  totalPages: () => pages.length
-};
