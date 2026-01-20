@@ -1,9 +1,11 @@
 let pages = [];
 let current = 0;
 let isAnimating = false;
-let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+let isCoverMode = true; // Começa com capa única
 
 // Elementos DOM
+const coverPage = document.getElementById('coverPage');
+const coverImg = document.getElementById('coverImg');
 const leftImg = document.getElementById('leftImg');
 const rightImg = document.getElementById('rightImg');
 const flipImg = document.getElementById('flipImg');
@@ -11,92 +13,179 @@ const flipPage = document.getElementById('flipPage');
 const counter = document.getElementById('pageCounter');
 const btnNext = document.querySelector('.nav.next');
 const btnPrev = document.querySelector('.nav.prev');
-const swipeHint = document.getElementById('swipeHint');
 
-// Carregar páginas
+// Carregar páginas do JSON
 fetch('album.json', { cache: 'no-store' })
   .then(r => r.json())
   .then(data => {
     pages = data;
     render();
     updateButtons();
-    setupMobile();
   });
 
+// Renderizar página atual
 function render() {
-  leftImg.src = pages[current]?.image || '';
-  leftImg.style.opacity = '1';
-  
-  if (pages[current + 1]) {
-    rightImg.src = pages[current + 1].image;
-    rightImg.style.opacity = '1';
-    rightImg.style.display = 'block';
+  if (isCoverMode) {
+    // MODO CAPA: Mostrar apenas a capa centralizada
+    coverPage.style.display = 'flex';
+    leftImg.parentElement.style.display = 'none';
+    rightImg.parentElement.style.display = 'none';
+    
+    coverImg.src = pages[0]?.image || '';
+    coverImg.style.opacity = '1';
+    
+    // Atualizar contador para capa
+    counter.textContent = 'Capa';
   } else {
-    rightImg.style.display = 'none';
+    // MODO PÁGINAS DUPLAS
+    coverPage.style.display = 'none';
+    leftImg.parentElement.style.display = 'flex';
+    rightImg.parentElement.style.display = 'flex';
+    
+    // Índices ajustados: pular a capa (índice 0)
+    const leftIndex = 1 + (current * 2);
+    const rightIndex = leftIndex + 1;
+    
+    leftImg.src = pages[leftIndex]?.image || '';
+    leftImg.style.opacity = '1';
+    
+    if (pages[rightIndex]) {
+      rightImg.src = pages[rightIndex].image;
+      rightImg.style.opacity = '1';
+      rightImg.style.display = 'block';
+    } else {
+      rightImg.style.display = 'none';
+    }
+    
+    // Atualizar contador para páginas duplas
+    const totalDoublePages = Math.ceil((pages.length - 1) / 2);
+    counter.textContent = `Páginas ${current + 1}-${current + 2} de ${totalDoublePages * 2}`;
   }
-  
-  updateCounter();
 }
 
-function updateCounter() {
-  const total = pages.length;
-  const currentPage = Math.floor(current / 2) + 1;
-  const totalPages = Math.ceil(total / 2);
-  counter.textContent = `Página ${currentPage} de ${totalPages}`;
-}
-
+// Atualizar estado dos botões
 function updateButtons() {
-  btnPrev.disabled = current <= 0 || isAnimating;
-  btnNext.disabled = current + 2 >= pages.length || isAnimating;
+  if (isCoverMode) {
+    // Na capa: botão anterior desabilitado, próximo habilitado
+    btnPrev.disabled = true;
+    btnNext.disabled = false;
+  } else {
+    // Nas páginas duplas
+    const totalDoublePages = Math.ceil((pages.length - 1) / 2);
+    
+    // Botão anterior: habilitado se não estiver na primeira página dupla
+    btnPrev.disabled = current <= 0 || isAnimating;
+    
+    // Botão próximo: habilitado se não estiver na última página dupla
+    btnNext.disabled = current >= totalDoublePages - 1 || isAnimating;
+  }
 }
 
-function flipNext() {
-  if (isAnimating || current + 2 >= pages.length) return;
+// Próxima página
+function nextPage() {
+  if (isAnimating) return;
+  
+  if (isCoverMode) {
+    // Transição da capa para a primeira página dupla
+    isCoverMode = false;
+    current = 0;
+    isAnimating = true;
+    
+    // Animação de transição
+    coverPage.style.transition = 'opacity 0.5s ease';
+    coverPage.style.opacity = '0';
+    
+    setTimeout(() => {
+      render();
+      coverPage.style.opacity = '1';
+      coverPage.style.transition = '';
+      isAnimating = false;
+      updateButtons();
+    }, 500);
+  } else {
+    // Páginas duplas: animação de flip
+    flipToNextDoublePage();
+  }
+}
+
+// Página anterior
+function prevPage() {
+  if (isAnimating) return;
+  
+  if (current === 0 && !isCoverMode) {
+    // Voltar da primeira página dupla para a capa
+    isCoverMode = true;
+    isAnimating = true;
+    
+    // Animação de transição
+    leftImg.parentElement.style.transition = 'opacity 0.5s ease';
+    rightImg.parentElement.style.transition = 'opacity 0.5s ease';
+    leftImg.parentElement.style.opacity = '0';
+    rightImg.parentElement.style.opacity = '0';
+    
+    setTimeout(() => {
+      render();
+      leftImg.parentElement.style.opacity = '1';
+      rightImg.parentElement.style.opacity = '1';
+      leftImg.parentElement.style.transition = '';
+      rightImg.parentElement.style.transition = '';
+      isAnimating = false;
+      updateButtons();
+    }, 500);
+  } else if (!isCoverMode && current > 0) {
+    // Páginas duplas: animação de flip reverso
+    flipToPrevDoublePage();
+  }
+}
+
+// Flip para próxima página dupla
+function flipToNextDoublePage() {
+  const totalDoublePages = Math.ceil((pages.length - 1) / 2);
+  if (current >= totalDoublePages - 1) return;
   
   isAnimating = true;
   updateButtons();
   
-  const flipDuration = isMobile ? 800 : 1200;
-  
-  flipImg.src = pages[current + 1].image;
+  const rightIndex = 2 + (current * 2);
+  flipImg.src = pages[rightIndex]?.image || '';
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(0deg)';
   rightImg.style.opacity = '0';
   
   setTimeout(() => {
-    flipPage.style.transition = `transform ${flipDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+    flipPage.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
     flipPage.style.transform = 'rotateY(-180deg)';
   }, 50);
   
   setTimeout(() => {
-    current += 2;
+    current++;
     flipPage.style.transition = 'none';
     flipPage.style.transform = 'rotateY(0deg)';
     flipPage.style.display = 'none';
     render();
     isAnimating = false;
     updateButtons();
-    hideSwipeHint();
-  }, flipDuration + 50);
+  }, 1050);
 }
 
-function flipPrev() {
-  if (isAnimating || current <= 0) return;
+// Flip para página dupla anterior
+function flipToPrevDoublePage() {
+  if (current <= 0) return;
   
   isAnimating = true;
   updateButtons();
   
-  const flipDuration = isMobile ? 800 : 1200;
-  current -= 2;
+  current--;
   
-  flipImg.src = pages[current + 1]?.image || '';
+  const rightIndex = 2 + (current * 2);
+  flipImg.src = pages[rightIndex]?.image || '';
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(-180deg)';
   leftImg.style.opacity = '0.5';
   rightImg.style.opacity = '0';
   
   setTimeout(() => {
-    flipPage.style.transition = `transform ${flipDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+    flipPage.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
     flipPage.style.transform = 'rotateY(0deg)';
   }, 50);
   
@@ -107,91 +196,57 @@ function flipPrev() {
     render();
     isAnimating = false;
     updateButtons();
-    hideSwipeHint();
-  }, flipDuration + 50);
-}
-
-// Configurações específicas para mobile
-function setupMobile() {
-  if (!isMobile) return;
-  
-  // Forçar redimensionamento inicial
-  window.dispatchEvent(new Event('resize'));
-  
-  // Ajustar tamanho do texto para mobile
-  document.body.style.fontSize = '16px';
-  
-  // Remover hint após 5 segundos
-  setTimeout(hideSwipeHint, 5000);
-}
-
-function hideSwipeHint() {
-  if (swipeHint) {
-    swipeHint.style.opacity = '0';
-    swipeHint.style.transition = 'opacity 0.5s';
-    setTimeout(() => {
-      if (swipeHint.parentNode) {
-        swipeHint.parentNode.removeChild(swipeHint);
-      }
-    }, 500);
-  }
+  }, 1050);
 }
 
 // Event listeners
-btnNext.onclick = flipNext;
-btnPrev.onclick = flipPrev;
+btnNext.addEventListener('click', nextPage);
+btnPrev.addEventListener('click', prevPage);
 
-// Teclado
+// Navegação por teclado
 document.addEventListener('keydown', (e) => {
   if (isAnimating) return;
-  if (e.key === 'ArrowRight' || e.key === ' ') flipNext();
-  else if (e.key === 'ArrowLeft') flipPrev();
+  
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    nextPage();
+  } else if (e.key === 'ArrowLeft') {
+    prevPage();
+  }
 });
 
-// Touch events otimizados para mobile
+// Swipe para mobile
 let touchStartX = 0;
+let touchEndX = 0;
 let touchStartY = 0;
-let touchStartTime = 0;
 
 document.addEventListener('touchstart', (e) => {
-  if (e.touches.length > 1) return;
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
-  touchStartTime = Date.now();
-  e.preventDefault();
-}, { passive: false });
-
-document.addEventListener('touchmove', (e) => {
-  if (e.touches.length > 1) return;
-  e.preventDefault();
-}, { passive: false });
+});
 
 document.addEventListener('touchend', (e) => {
-  if (isAnimating || e.changedTouches.length > 1) return;
+  if (isAnimating) return;
   
-  const touchEndX = e.changedTouches[0].clientX;
+  touchEndX = e.changedTouches[0].clientX;
   const touchEndY = e.changedTouches[0].clientY;
-  const touchEndTime = Date.now();
   
   const deltaX = touchEndX - touchStartX;
   const deltaY = touchEndY - touchStartY;
-  const deltaTime = touchEndTime - touchStartTime;
   
-  // Ignorar toques muito longos ou arrastos verticais
-  if (deltaTime > 500 || Math.abs(deltaY) > 50) return;
+  // Ignorar swipes verticais
+  if (Math.abs(deltaY) > Math.abs(deltaX)) return;
   
-  // Limiar mais sensível para mobile
+  // Limiar para swipe
   const threshold = Math.min(window.innerWidth * 0.1, 50);
   
   if (Math.abs(deltaX) > threshold) {
     if (deltaX > 0) {
-      // Swipe para direita
-      flipPrev();
+      // Swipe para direita: página anterior
+      prevPage();
     } else {
-      // Swipe para esquerda
-      flipNext();
+      // Swipe para esquerda: próxima página
+      nextPage();
     }
-    e.preventDefault();
   }
 });
 
@@ -200,29 +255,18 @@ document.addEventListener('gesturestart', (e) => {
   e.preventDefault();
 });
 
-// Redimensionamento
-let resizeTimeout;
+// Ajustar ao redimensionar a janela
 window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    updateButtons();
-    
-    // Ajustar para mobile em tempo real
-    isMobile = window.innerWidth <= 768;
-    
-    // Ajustar tamanho do contador em landscape
-    if (window.innerHeight < window.innerWidth) {
-      counter.style.fontSize = '13px';
-      counter.style.padding = '8px 16px';
-    }
-  }, 250);
+  updateButtons();
 });
 
 // Verificar imagens
 function checkImages() {
   pages.forEach(page => {
     const img = new Image();
-    img.onerror = () => console.warn(`Imagem não encontrada: ${page.image}`);
+    img.onerror = function() {
+      console.warn(`Imagem não encontrada: ${page.image}`);
+    };
     img.src = page.image;
   });
 }
@@ -234,3 +278,23 @@ fetch('album.json')
     pages = data;
     checkImages();
   });
+
+// Função para debug
+window.debugAlbum = {
+  goToPage: (page) => {
+    if (page === 0) {
+      isCoverMode = true;
+      current = 0;
+    } else {
+      isCoverMode = false;
+      current = Math.floor((page - 1) / 2);
+    }
+    render();
+    updateButtons();
+  },
+  currentState: () => ({
+    isCoverMode,
+    current,
+    totalPages: pages.length
+  })
+};
