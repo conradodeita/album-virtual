@@ -6,50 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#ffffff">
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Reset global para mobile */
-    * {
-      -webkit-text-size-adjust: 100%;
-      -moz-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-    }
-    
-    /* Ajuste específico para mobile */
-    @media (max-width: 768px) {
-      html, body {
-        overflow-x: hidden !important;
-        touch-action: pan-y !important;
-        position: fixed !important;
-        width: 100% !important;
-        height: 100% !important;
-      }
-    }
-  </style>
 </head>
 <body>
 
 <div class="stage">
   <button class="nav prev" aria-label="Página anterior">‹</button>
   <div class="book" id="book">
+    <!-- Página única para capa -->
+    <div class="page single cover-page" id="coverPage">
+      <img id="coverImg">
+    </div>
+    
+    <!-- Páginas duplas para o restante -->
     <div class="page left">
-      <img id="leftImg" loading="lazy">
+      <img id="leftImg">
     </div>
     <div class="page right">
-      <img id="rightImg" loading="lazy">
+      <img id="rightImg">
     </div>
     <div class="page flip-page" id="flipPage">
-      <img id="flipImg" loading="lazy">
+      <img id="flipImg">
     </div>
   </div>
   <button class="nav next" aria-label="Próxima página">›</button>
 </div>
 
 <div id="pageCounter"></div>
-
-<!-- Indicador de swipe para mobile -->
-<div id="swipeHint" class="swipe-hint">← Deslize →</div>
 
 <script src="script.js"></script>
 </body>
