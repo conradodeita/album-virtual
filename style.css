@@ -1,35 +1,138 @@
 * {
   box-sizing: border-box;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 body {
   margin: 0;
   background: linear-gradient(135deg, #1a2980, #26d0ce);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  padding: 10px;
+  overflow-x: hidden;
+  position: relative;
 }
 
+/* STAGE - Container principal */
 .stage {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 40px;
-  padding: 20px;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
 }
 
+/* MODO DESKTOP (acima de 768px) */
+@media (min-width: 769px) {
+  .stage {
+    gap: 40px;
+    padding: 20px;
+  }
+  
+  .book {
+    width: 1200px;
+    height: 700px;
+    display: block;
+  }
+  
+  .page.single {
+    display: none !important;
+  }
+  
+  .page.left,
+  .page.right {
+    display: flex;
+  }
+  
+  .page-dots {
+    display: none;
+  }
+}
+
+/* MODO MOBILE (até 768px) */
+@media (max-width: 768px) {
+  body {
+    padding: 5px;
+    justify-content: flex-start;
+    padding-top: 60px;
+  }
+  
+  .stage {
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+    width: 100%;
+    height: calc(100vh - 150px);
+  }
+  
+  .book {
+    width: 95vw;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    perspective: 1000px;
+  }
+  
+  /* Esconde páginas duplas no mobile */
+  .page.left,
+  .page.right {
+    display: none !important;
+  }
+  
+  .page.single {
+    display: flex !important;
+    position: relative;
+    width: 100% !important;
+    height: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    border-radius: 8px !important;
+  }
+  
+  .nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 28px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+  }
+  
+  .nav.prev {
+    left: 10px;
+  }
+  
+  .nav.next {
+    right: 10px;
+  }
+  
+  /* Botões de navegação na parte inferior */
+  .nav-bottom {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .nav-bottom .nav {
+    position: static;
+    transform: none;
+  }
+}
+
+/* BOOK - Container do álbum */
 .book {
   position: relative;
-  width: 1200px;
-  height: 700px;
   perspective: 2000px;
   background: #f5f5f5;
   border-radius: 8px;
@@ -38,10 +141,9 @@ body {
     0 0 0 1px rgba(255,255,255,0.1) inset;
 }
 
+/* PÁGINAS - Estilos base */
 .page {
   position: absolute;
-  width: 600px;
-  height: 700px;
   background: white;
   overflow: hidden;
   display: flex;
@@ -49,10 +151,13 @@ body {
   justify-content: center;
   backface-visibility: hidden;
   transform-style: preserve-3d;
+  border-radius: 0 8px 8px 0;
 }
 
 .page.left {
   left: 0;
+  width: 50%;
+  height: 100%;
   border-radius: 8px 0 0 8px;
   box-shadow: 
     -15px 0 30px rgba(0,0,0,0.15),
@@ -61,11 +166,23 @@ body {
 
 .page.right {
   right: 0;
+  width: 50%;
+  height: 100%;
   transform-origin: left center;
   border-radius: 0 8px 8px 0;
   box-shadow: 
     5px 0 15px rgba(0,0,0,0.1),
     -1px 0 0 rgba(0,0,0,0.05) inset;
+}
+
+.page.single {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.2),
+    inset 0 0 0 1px rgba(0,0,0,0.05);
 }
 
 .page.flip-page {
@@ -77,143 +194,242 @@ body {
   border-radius: 0 8px 8px 0;
 }
 
-/* Para imagens que mantêm proporção sem distorção */
+/* IMAGENS */
 .page img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Mantém proporção sem cortar */
+  object-fit: contain;
   background: white;
+  display: block;
 }
 
-/* Para páginas que querem preencher completamente */
-.page img.cover {
-  object-fit: cover; /* Preenche cortando se necessário */
-}
-
+/* BOTÕES DE NAVEGAÇÃO */
 .nav {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
   border: none;
-  font-size: 40px;
+  font-size: 36px;
   cursor: pointer;
   color: #1a2980;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  position: relative;
 }
 
-.nav::after {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: -5px;
-  right: -5px;
-  bottom: -5px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #1a2980, #26d0ce);
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.nav:hover::after {
-  opacity: 1;
-}
-
-.nav:hover {
+.nav:hover:not(:disabled) {
+  background: white;
   transform: scale(1.1);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
 }
 
-.nav:active {
+.nav:active:not(:disabled) {
   transform: scale(0.95);
 }
 
 .nav:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
   transform: none;
 }
 
-.nav:disabled::after {
-  display: none;
-}
-
+/* CONTADOR DE PÁGINAS */
 #pageCounter {
-  margin-top: 30px;
+  margin-top: 20px;
   text-align: center;
   font-size: 16px;
   color: white;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.3);
   padding: 12px 30px;
   border-radius: 25px;
-  font-weight: 600;
+  font-weight: 500;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.1);
+  z-index: 100;
 }
 
-.double-page-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, #ff9a00, #ff6a00);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  margin-left: 10px;
-  vertical-align: middle;
+/* PONTINHOS PARA MOBILE */
+.page-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+  max-width: 90vw;
+  padding: 10px;
 }
 
-/* Sombra suave para as páginas */
-.page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  box-shadow: inset 0 0 30px rgba(0,0,0,0.03);
-  pointer-events: none;
-  border-radius: inherit;
+.page-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
-@media (max-width: 1300px) {
-  .book {
-    width: 90vw;
-    height: calc(90vw * 0.583); /* Mantém proporção 600:700 */
-    max-width: 1200px;
-    max-height: 700px;
+.page-dot:hover {
+  transform: scale(1.2);
+}
+
+.page-dot.active {
+  background: white;
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* BOTÃO DE ALTERNÂNCIA MODO VIEW */
+.toggle-view {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.toggle-view:hover {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.toggle-view .desktop-icon {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .toggle-view .mobile-icon {
+    display: none;
   }
   
-  .page {
-    width: 50%;
-    height: 100%;
+  .toggle-view .desktop-icon {
+    display: inline;
   }
 }
 
-@media (max-width: 768px) {
+/* ANIMAÇÕES PARA MOBILE */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.page.single.slide-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.page.single.slide-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+/* MODO RETRATO (vertical muito estreito) */
+@media (max-height: 500px) and (orientation: portrait) {
   .stage {
-    gap: 20px;
+    height: 80vh;
   }
   
   .book {
-    height: 70vh;
-    width: calc(70vh * 0.857); /* Mantém proporção */
-  }
-  
-  .nav {
-    width: 50px;
-    height: 50px;
-    font-size: 30px;
+    height: 65vh;
   }
   
   #pageCounter {
     font-size: 14px;
-    padding: 10px 20px;
+    padding: 8px 20px;
+    margin-top: 10px;
+  }
+}
+
+/* MODO PAISAGEM EM MOBILE */
+@media (max-width: 768px) and (orientation: landscape) {
+  .book {
+    width: 85vw;
+    height: 80vh;
+  }
+  
+  .stage {
+    height: 85vh;
+  }
+  
+  .nav {
+    width: 45px !important;
+    height: 45px !important;
+    font-size: 24px !important;
+  }
+}
+
+/* MELHORIAS PARA TOUCH */
+@media (pointer: coarse) {
+  .nav {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .page-dot {
+    min-width: 16px;
+    min-height: 16px;
+  }
+  
+  button {
+    cursor: pointer;
+  }
+}
+
+/* INDICADOR DE SWIPE */
+.swipe-indicator {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 12px;
+  background: rgba(0,0,0,0.3);
+  padding: 5px 15px;
+  border-radius: 15px;
+  opacity: 0.8;
+  animation: pulse 2s infinite;
+  display: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+@media (max-width: 768px) {
+  .swipe-indicator {
+    display: block;
   }
 }
