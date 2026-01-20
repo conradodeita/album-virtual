@@ -14,24 +14,16 @@ const counter = document.getElementById('pageCounter');
 const btnNext = document.querySelector('.nav.next');
 const btnPrev = document.querySelector('.nav.prev');
 
-// Função para verificar se um par de páginas é duplo
-function isDoublePagePair(pageIndex) {
-  // Lógica: páginas 7-8, 15-16, 23-24, 31-32, 39-40, 47-48 são duplas
-  // pageIndex começa em 1 (página 1) após a capa
+// FUNÇÃO CORRIGIDA: Verifica se um par de páginas é duplo
+function isDoublePagePair(pairIndex) {
+  // pairIndex: 0 = páginas 1-2, 1 = páginas 3-4, 2 = páginas 5-6, 3 = páginas 7-8, etc.
+  // Páginas duplas: pares 3, 7, 11, 15, 19, 23 (7-8, 15-16, 23-24, 31-32, 39-40, 47-48)
+  // Padrão: 3 + 4n (n=0,1,2,3,4,5)
   
-  // Converter para número da página real (1-indexed)
-  const pageNumber = pageIndex + 1;
+  if (pairIndex < 3) return false; // Primeiros 3 pares são simples (1-6)
   
-  // Verificar se está na sequência: 7-8, 15-16, 23-24, etc.
-  // Padrão: 7 + 8n até 8 + 8n (n = 0,1,2,3,4,5)
-  for (let n = 0; n <= 5; n++) {
-    const startPage = 7 + (8 * n);
-    const endPage = 8 + (8 * n);
-    if (pageNumber >= startPage && pageNumber <= endPage) {
-      return true;
-    }
-  }
-  return false;
+  const n = pairIndex - 3;
+  return n % 4 === 0; // A cada 4 pares, começando do par 3
 }
 
 // Carregar páginas do JSON
@@ -41,6 +33,8 @@ fetch('album.json', { cache: 'no-store' })
     pages = data;
     render();
     updateButtons();
+    console.log('Páginas carregadas:', pages.length);
+    console.log('Pares duplos esperados: 7-8, 15-16, 23-24, 31-32, 39-40, 47-48');
   });
 
 // Renderizar página atual
@@ -61,35 +55,37 @@ function render() {
     leftImg.parentElement.style.display = 'flex';
     rightImg.parentElement.style.display = 'flex';
     
-    // Índices ajustados: pular a capa (índice 0)
-    const leftIndex = 1 + (current * 2);
-    const rightIndex = leftIndex + 1;
-    
-    // Verificar se é uma página dupla
-    const isDoublePage = isDoublePagePair(current * 2);
+    const isDoublePage = isDoublePagePair(current);
     
     if (isDoublePage) {
-      // PÁGINA DUPLA: usar nomes específicos
-      const pageNumber = current * 2 + 1; // 1-indexed
+      // PÁGINA DUPLA: usar imagens específicas
+      const pageNumber = (current * 2) + 1; // Número da primeira página do par
       const baseName = `pagina${String(pageNumber).padStart(2, '0')}`;
       
-      leftImg.src = `${baseName}_esq.jpg` || '';
-      rightImg.src = `${baseName}_dir.jpg` || '';
+      leftImg.src = `${baseName}_esq.jpg`;
+      rightImg.src = `${baseName}_dir.jpg`;
+      
+      console.log(`Página dupla: ${baseName}_esq.jpg + ${baseName}_dir.jpg`);
     } else {
-      // PÁGINA SIMPLES: nomes padrão
+      // PÁGINA SIMPLES: usar imagens padrão do JSON
+      const leftIndex = 1 + (current * 2);
+      const rightIndex = leftIndex + 1;
+      
       leftImg.src = pages[leftIndex]?.image || '';
+      
       if (pages[rightIndex]) {
         rightImg.src = pages[rightIndex].image || '';
         rightImg.style.display = 'block';
       } else {
         rightImg.style.display = 'none';
       }
+      
+      console.log(`Página simples: ${pages[leftIndex]?.image} + ${pages[rightIndex]?.image}`);
     }
     
     leftImg.style.opacity = '1';
     rightImg.style.opacity = '1';
     
-    // Atualizar contador
     updateCounter();
   }
 }
@@ -97,10 +93,11 @@ function render() {
 // Atualizar contador
 function updateCounter() {
   if (!isCoverMode) {
-    const totalPages = Math.floor((pages.length - 1) / 2) * 2; // Total de páginas internas (pares)
+    const totalPages = pages.length - 1; // Exclui capa
+    const totalPairs = Math.ceil(totalPages / 2);
     const currentPageStart = (current * 2) + 1;
-    const currentPageEnd = currentPageStart + 1;
-    const isDoublePage = isDoublePagePair(current * 2);
+    const currentPageEnd = Math.min(currentPageStart + 1, totalPages);
+    const isDoublePage = isDoublePagePair(current);
     
     let counterText = `Páginas ${currentPageStart}-${currentPageEnd}`;
     if (isDoublePage) {
@@ -116,9 +113,10 @@ function updateButtons() {
     btnPrev.disabled = true;
     btnNext.disabled = false;
   } else {
-    const totalDoublePages = Math.floor((pages.length - 1) / 2);
+    const totalPages = pages.length - 1;
+    const totalPairs = Math.ceil(totalPages / 2);
     btnPrev.disabled = current <= 0 || isAnimating;
-    btnNext.disabled = current >= totalDoublePages - 1 || isAnimating;
+    btnNext.disabled = current >= totalPairs - 1 || isAnimating;
   }
 }
 
@@ -177,24 +175,27 @@ function prevPage() {
 
 // Flip para próxima página
 function flipToNextDoublePage() {
-  const totalDoublePages = Math.floor((pages.length - 1) / 2);
-  if (current >= totalDoublePages - 1) return;
+  const totalPages = pages.length - 1;
+  const totalPairs = Math.ceil(totalPages / 2);
+  if (current >= totalPairs - 1) return;
   
   isAnimating = true;
   updateButtons();
   
-  const isDoublePage = isDoublePagePair(current * 2 + 2);
-  const nextPageNumber = current * 2 + 3;
-  const baseName = `pagina${String(nextPageNumber).padStart(2, '0')}`;
+  // Preparar imagem para flip (página direita do próximo par)
+  const nextPair = current + 1;
+  let nextImage;
   
-  // Preparar imagem para flip
-  if (isDoublePage) {
-    flipImg.src = `${baseName}_esq.jpg`;
+  if (isDoublePagePair(nextPair)) {
+    const pageNumber = (nextPair * 2) + 1;
+    const baseName = `pagina${String(pageNumber).padStart(2, '0')}`;
+    nextImage = `${baseName}_esq.jpg`;
   } else {
-    const rightIndex = 2 + (current * 2);
-    flipImg.src = pages[rightIndex]?.image || '';
+    const nextIndex = 1 + (nextPair * 2);
+    nextImage = pages[nextIndex]?.image || '';
   }
   
+  flipImg.src = nextImage;
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(0deg)';
   rightImg.style.opacity = '0';
@@ -222,20 +223,19 @@ function flipToPrevDoublePage() {
   isAnimating = true;
   updateButtons();
   
-  current--;
+  // Preparar imagem para flip (página esquerda do par atual)
+  let prevImage;
   
-  const isDoublePage = isDoublePagePair(current * 2 + 2);
-  const nextPageNumber = current * 2 + 3;
-  const baseName = `pagina${String(nextPageNumber).padStart(2, '0')}`;
-  
-  // Preparar imagem para flip
-  if (isDoublePage) {
-    flipImg.src = `${baseName}_esq.jpg`;
+  if (isDoublePagePair(current)) {
+    const pageNumber = (current * 2) + 1;
+    const baseName = `pagina${String(pageNumber).padStart(2, '0')}`;
+    prevImage = `${baseName}_esq.jpg`;
   } else {
-    const rightIndex = 2 + (current * 2);
-    flipImg.src = pages[rightIndex]?.image || '';
+    const currentIndex = 1 + (current * 2);
+    prevImage = pages[currentIndex]?.image || '';
   }
   
+  flipImg.src = prevImage;
   flipPage.style.display = 'flex';
   flipPage.style.transform = 'rotateY(-180deg)';
   leftImg.style.opacity = '0.5';
@@ -247,6 +247,7 @@ function flipToPrevDoublePage() {
   }, 50);
   
   setTimeout(() => {
+    current--;
     flipPage.style.transition = 'none';
     flipPage.style.transform = 'rotateY(0deg)';
     flipPage.style.display = 'none';
@@ -284,9 +285,10 @@ document.addEventListener('touchend', (e) => {
   }
 });
 
-// Inicializar
-fetch('album.json')
-  .then(r => r.json())
-  .then(data => {
-    pages = data;
-  });
+// Debug: testar função isDoublePagePair
+console.log('Teste isDoublePagePair:');
+for (let i = 0; i < 25; i++) {
+  const pageStart = i * 2 + 1;
+  const pageEnd = pageStart + 1;
+  console.log(`Par ${i} (páginas ${pageStart}-${pageEnd}): ${isDoublePagePair(i) ? 'DUPLO' : 'simples'}`);
+}
