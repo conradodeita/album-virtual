@@ -154,7 +154,7 @@ function updateCounter() {
     }
 }
 
-// Atualizar botões
+// Atualizar botões - CORRIGIDO: botão anterior sempre habilitado quando não na capa
 function updateButtons() {
     if (isCoverMode) {
         btnPrev.disabled = true;
@@ -163,7 +163,11 @@ function updateButtons() {
     } else {
         const totalPages = pages.length - 1;
         const totalPairs = Math.ceil(totalPages / 2);
-        btnPrev.disabled = current <= 0 || isAnimating;
+        
+        // CORREÇÃO: Botão anterior sempre habilitado quando não está na capa
+        // (permite voltar da primeira página para a capa)
+        btnPrev.disabled = isAnimating; // Apenas desabilitado durante animação
+        
         btnNext.disabled = current >= totalPairs - 1 || isAnimating;
     }
 }
@@ -193,11 +197,12 @@ function nextPage() {
     }
 }
 
-// Página anterior
+// Página anterior - CORRIGIDO: agora funciona da página 1 para a capa
 function prevPage() {
     if (isAnimating) return;
     
-    if (current === 0 && !isCoverMode) {
+    // CORREÇÃO: Se está na primeira página dupla (current === 0) e não na capa, voltar para capa
+    if (!isCoverMode && current === 0) {
         // Da primeira página dupla para capa
         isCoverMode = true;
         isAnimating = true;
@@ -217,6 +222,7 @@ function prevPage() {
             updateButtons();
         }, 500);
     } else if (!isCoverMode && current > 0) {
+        // Páginas internas
         flipToPrevDoublePage();
     }
 }
