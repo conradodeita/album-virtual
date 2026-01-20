@@ -29,14 +29,87 @@
   },
   {
     "type": "pagina",
-    "image": "pagina07.jpg"
+    "image": "pagina07_esq.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina07_dir.jpg"
   },
   {
     "type": "pagina",
     "image": "pagina08.jpg"
   },
   {
-    "type": "contracapa",
-    "image": "ContraCapa.jpg"
+    "type": "pagina",
+    "image": "pagina09.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina10.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina11.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina12.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina13.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina14.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina15_esq.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina15_dir.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina16.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina17.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina18.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina19.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina20.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina21.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina22.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina23_esq.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina23_dir.jpg"
+  },
+  {
+    "type": "pagina",
+    "image": "pagina24.jpg"
   }
+  // Continue seguindo o padrão até a página 50...
 ]
