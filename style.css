@@ -1,290 +1,72 @@
-/* RESET E CONFIGURAÇÕES GERAIS */
-* {
-  box-sizing: border-box;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: transparent;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* CONTAINER PRINCIPAL */
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: transparent;
-}
-
-.stage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  gap: 20px;
-  padding: 10px;
-}
-
-/* LIVRO - Container principal */
-.book {
-  position: relative;
-  width: min(95vw, 1200px);
-  height: min(85vh, 700px);
-  perspective: 2000px;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ESTILOS PARA PÁGINAS */
-.page {
-  position: absolute;
-  background: white;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-  box-shadow: 
-    0 10px 30px rgba(0,0,0,0.15),
-    inset 0 0 0 1px rgba(0,0,0,0.05);
-}
-
-/* CAPA ÚNICA (centralizada) */
-.page.single.cover-page {
-  width: 50%;
-  height: 100%;
-  border-radius: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-}
-
-/* PÁGINAS DUPLAS */
-.page.left {
-  width: 50%;
-  height: 100%;
-  left: 0;
-  border-radius: 8px 0 0 8px;
-}
-
-.page.right {
-  width: 50%;
-  height: 100%;
-  right: 0;
-  transform-origin: left center;
-  border-radius: 0 8px 8px 0;
-}
-
-.page.flip-page {
-  width: 50%;
-  height: 100%;
-  right: 0;
-  transform-origin: left center;
-  z-index: 10;
-  display: none;
-  border-radius: 0 8px 8px 0;
-}
-
-/* IMAGENS */
-.page img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  background: white;
-}
-
-/* BOTÕES DE NAVEGAÇÃO */
-.nav {
-  width: 60px;
-  height: 60px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  font-size: 36px;
-  cursor: pointer;
-  color: #1a2980;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.nav:hover:not(:disabled) {
-  background: white;
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-}
-
-.nav:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
-.nav:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* CONTADOR DE PÁGINAS */
-#pageCounter {
-  margin-top: 20px;
-  text-align: center;
-  font-size: clamp(14px, 3vw, 16px);
-  color: rgba(0, 0, 0, 0.8);
-  background: rgba(255, 255, 255, 0.9);
-  padding: 12px 25px;
-  border-radius: 25px;
-  font-weight: 500;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255,255,255,0.3);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* RESPONSIVIDADE PARA MOBILE */
-@media (max-width: 768px) {
-  .stage {
-    gap: 10px;
-    padding: 5px;
-    height: 90vh;
-  }
-  
-  .book {
-    width: 98vw;
-    height: 75vh;
-    perspective: 1000px;
-  }
-  
-  /* Capa em mobile */
-  .page.single.cover-page {
-    width: 70%; /* Mais larga no mobile */
-    max-width: 400px;
-  }
-  
-  /* Botões fixos em mobile */
-  .nav {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 50px;
-    height: 50px;
-    font-size: 30px;
-  }
-  
-  .nav.prev {
-    left: 10px;
-  }
-  
-  .nav.next {
-    right: 10px;
-  }
-  
-  #pageCounter {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: 0;
-    font-size: 14px;
-    padding: 10px 20px;
-    width: auto;
-    white-space: nowrap;
-  }
-}
-
-/* Mobile muito pequeno */
-@media (max-width: 480px) {
-  .book {
-    height: 70vh;
-  }
-  
-  .page.single.cover-page {
-    width: 85%;
-  }
-  
-  .nav {
-    width: 45px;
-    height: 45px;
-    font-size: 28px;
-  }
-}
-
-/* Orientação paisagem no mobile */
-@media (max-width: 768px) and (orientation: landscape) {
-  .book {
-    height: 85vh;
-  }
-  
-  #pageCounter {
-    bottom: 10px;
-  }
-}
-
-/* Tablet */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .book {
-    width: 90vw;
-    height: 75vh;
-  }
-}
-
-/* Desktop grande */
-@media (min-width: 1025px) {
-  .nav:hover:not(:disabled) {
-    background: white;
-    transform: scale(1.1);
-  }
-}
+/* Adicione estas regras ao seu CSS existente */
 
 /* Indicador de página dupla */
 .double-page-indicator {
   position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.6);
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 152, 0, 0.9);
   color: white;
-  padding: 4px 12px;
-  border-radius: 15px;
-  font-size: 12px;
-  font-weight: 500;
-  opacity: 0.8;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
   z-index: 20;
+  backdrop-filter: blur(5px);
+  animation: pulse 2s infinite;
 }
 
-/* ANIMAÇÕES */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
-.page {
-  animation: fadeIn 0.3s ease-out;
+/* Estilo para páginas duplas */
+.page.double-left {
+  border-right: 2px solid transparent;
 }
 
-/* Prevenir seleção de texto */
-.page, .nav, #pageCounter {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+.page.double-right {
+  border-left: 2px solid transparent;
+}
+
+/* Efeito de união visual para páginas duplas */
+.double-page-union {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 80%;
+  background: linear-gradient(to bottom, 
+    rgba(255,152,0,0.3), 
+    rgba(255,152,0,0.1), 
+    rgba(255,152,0,0.3));
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Ajuste para contador em páginas duplas */
+#pageCounter.double-page {
+  background: rgba(255, 152, 0, 0.9);
+  color: white;
+  font-weight: 600;
+}
+
+/* Highlight leve para páginas duplas */
+.book.double-page-mode .page.left,
+.book.double-page-mode .page.right {
+  box-shadow: 
+    0 10px 30px rgba(255, 152, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 152, 0, 0.05);
+}
+
+/* Responsividade para indicador */
+@media (max-width: 768px) {
+  .double-page-indicator {
+    top: 5px;
+    right: 5px;
+    font-size: 10px;
+    padding: 3px 8px;
+  }
 }
