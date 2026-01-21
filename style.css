@@ -16,6 +16,39 @@ body {
   overflow-x: hidden;
 }
 
+/* Mensagem para dispositivos móveis */
+body::before {
+  content: "Este álbum virtual é otimizado apenas para navegadores de PC. Por favor, acesse em um computador.";
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ff5722;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  body {
+    justify-content: flex-start;
+    padding-top: 50px;
+  }
+  
+  body::before {
+    display: block;
+  }
+  
+  .stage {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+}
+
 .stage {
   position: relative;
   width: 100%;
@@ -196,79 +229,4 @@ body {
   box-shadow: 
     0 10px 40px rgba(255, 152, 0, 0.15),
     inset 0 0 0 2px rgba(255, 152, 0, 0.1);
-}
-
-/* Responsividade */
-@media (max-width: 1000px) {
-  .book {
-    width: 700px;
-    height: 500px;
-  }
-  
-  .page {
-    width: 350px;
-  }
-  
-  .page.single {
-    width: 700px;
-  }
-}
-
-@media (max-width: 768px) {
-  .stage {
-    gap: 10px;
-  }
-  
-  .book {
-    width: 95vw;
-    height: 400px;
-  }
-  
-  .page {
-    width: 50%;
-  }
-  
-  .page.single {
-    width: 95vw;
-  }
-  
-  .nav {
-    width: 50px;
-    height: 50px;
-    font-size: 28px;
-  }
-  
-  #pageCounter {
-    font-size: 14px;
-    padding: 10px 20px;
-  }
-  
-  .double-page-indicator {
-    top: 10px;
-    right: 10px;
-    font-size: 11px;
-    padding: 5px 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
-  
-  .book {
-    height: 300px;
-  }
-  
-  .nav {
-    width: 40px;
-    height: 40px;
-    font-size: 24px;
-  }
-  
-  #pageCounter {
-    font-size: 12px;
-    padding: 8px 16px;
-    min-width: 160px;
-  }
 }
