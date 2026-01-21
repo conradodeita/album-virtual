@@ -1,0 +1,274 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  perspective: 2000px;
+}
+
+.nav {
+  background: rgba(0, 0, 0, 0.05);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  color: #333;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  user-select: none;
+}
+
+.nav:hover:not(:disabled) {
+  background: rgba(255, 152, 0, 0.8);
+  transform: scale(1.1);
+  border-color: rgba(255, 152, 0, 0.9);
+  color: white;
+}
+
+.nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.nav.prev {
+  left: 20px;
+}
+
+.nav.next {
+  right: 20px;
+}
+
+.book {
+  position: relative;
+  width: 900px;
+  height: 600px;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
+  display: flex;
+}
+
+.page {
+  position: absolute;
+  width: 450px;
+  height: 100%;
+  background: white;
+  box-shadow: 
+    0 0 20px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.page.single {
+  width: 900px;
+  left: 0;
+}
+
+.page.left {
+  left: 0;
+  border-radius: 5px 0 0 5px;
+  transform-origin: right center;
+}
+
+.page.right {
+  right: 0;
+  border-radius: 0 5px 5px 0;
+  transform-origin: left center;
+}
+
+.page.flip-page {
+  display: none;
+  background: white;
+  z-index: 3;
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+
+.page img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+#pageCounter {
+  margin-top: 30px;
+  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  min-width: 200px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+#pageCounter.double-page {
+  background: rgba(255, 152, 0, 0.9);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+/* Indicador de página dupla */
+.double-page-indicator {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 152, 0, 0.9);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 20;
+  backdrop-filter: blur(5px);
+  animation: pulse 2s infinite;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+/* Efeito de união visual para páginas duplas */
+.double-page-union {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 85%;
+  background: linear-gradient(to bottom, 
+    rgba(255,152,0,0.4), 
+    rgba(255,152,0,0.2), 
+    rgba(255,152,0,0.4));
+  z-index: 15;
+  pointer-events: none;
+  border-radius: 3px;
+}
+
+/* Ajuste para contador em páginas duplas */
+#pageCounter.double-page {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.9), rgba(255, 193, 7, 0.9));
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+}
+
+/* Highlight leve para páginas duplas */
+.book.double-page-mode .page.left,
+.book.double-page-mode .page.right {
+  box-shadow: 
+    0 10px 40px rgba(255, 152, 0, 0.15),
+    inset 0 0 0 2px rgba(255, 152, 0, 0.1);
+}
+
+/* Responsividade */
+@media (max-width: 1000px) {
+  .book {
+    width: 700px;
+    height: 500px;
+  }
+  
+  .page {
+    width: 350px;
+  }
+  
+  .page.single {
+    width: 700px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stage {
+    gap: 10px;
+  }
+  
+  .book {
+    width: 95vw;
+    height: 400px;
+  }
+  
+  .page {
+    width: 50%;
+  }
+  
+  .page.single {
+    width: 95vw;
+  }
+  
+  .nav {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+  }
+  
+  #pageCounter {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+  
+  .double-page-indicator {
+    top: 10px;
+    right: 10px;
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+  
+  .book {
+    height: 300px;
+  }
+  
+  .nav {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+  
+  #pageCounter {
+    font-size: 12px;
+    padding: 8px 16px;
+    min-width: 160px;
+  }
+}

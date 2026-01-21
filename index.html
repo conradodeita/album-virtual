@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Álbum Virtual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="stage">
+  <button class="nav prev" aria-label="Página anterior">‹</button>
+  <div class="book" id="book">
+    <!-- Página única para capa -->
+    <div class="page single cover-page" id="coverPage">
+      <img id="coverImg">
+    </div>
+    
+    <!-- Páginas duplas para o restante -->
+    <div class="page left">
+      <img id="leftImg">
+    </div>
+    <div class="page right">
+      <img id="rightImg">
+    </div>
+    <div class="page flip-page" id="flipPage">
+      <img id="flipImg">
+    </div>
+  </div>
+  <button class="nav next" aria-label="Próxima página">›</button>
+</div>
+
+<div id="pageCounter"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
