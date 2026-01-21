@@ -314,7 +314,7 @@ function flipToPrevDoublePage() {
 btnNext.addEventListener('click', nextPage);
 btnPrev.addEventListener('click', prevPage);
 
-// Navegação por teclado
+// Navegação por teclado (apenas para PC)
 document.addEventListener('keydown', (e) => {
     if (isAnimating) return;
     if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
@@ -342,37 +342,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Swipe para dispositivos touch
-let touchStartX = 0;
-let touchStartY = 0;
-
-document.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-});
-
-document.addEventListener('touchend', (e) => {
-    if (isAnimating) return;
-    
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaX = touchEndX - touchStartX;
-    const deltaY = touchEndY - touchStartY;
-    
-    // Verificar se é um swipe horizontal (não vertical)
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        const threshold = Math.min(window.innerWidth * 0.1, 50);
-        if (Math.abs(deltaX) > threshold) {
-            if (deltaX > 0) {
-                prevPage();
-            } else {
-                nextPage();
-            }
-        }
-    }
-});
-
-// Clique nas bordas para navegar
+// Clique nas bordas para navegar (apenas para PC)
 document.addEventListener('click', (e) => {
     if (isAnimating) return;
     
@@ -390,9 +360,8 @@ document.addEventListener('click', (e) => {
 });
 
 // Log para debug
-console.log('Álbum Virtual inicializado');
-console.log('Controles:');
+console.log('Álbum Virtual inicializado - Versão PC');
+console.log('Controles (PC):');
 console.log('  - Setas ← → ou Espaço/PageDown para navegar');
-console.log('  - Swipe horizontal em dispositivos touch');
 console.log('  - Clique nas bordas da tela');
 console.log('  - Home para capa, End para última página');
